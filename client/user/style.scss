@@ -1,0 +1,469 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;400;900&family=Open+Sans:wght@300;400;800&display=swap');
+body {
+    line-height: 1;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 2em;    
+    /* background-color: rgb(0, 0, 0); */
+}
+
+
+$tabs-width: 600px;
+$tabs-transition: .35s cubic-bezier(0, 0, 0.2, 1);
+$tabs-color-primary: #4285f4;
+
+
+
+h1, h2, h3, h4 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 30px;
+    margin-top: 80px;
+}
+
+.hidden {
+    visibility: hidden;
+    display: none;
+}
+
+#content {
+    position: absolute;
+    left:0;right:0;top:0;bottom:0;
+    
+    height: 100vh;
+    width:100vw;
+
+
+    /* 
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    justify-content: center; 
+    */
+    /* 
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap; 
+    */
+    /* 
+    background: #092b08;
+    background: -moz-radial-gradient(center, ellipse cover, #092b08 0%, #000000 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, #092b08 0%,#000000 100%);
+    background: radial-gradient(ellipse at center, #092b08 0%,#000000 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#092b08', endColorstr='#000000',GradientType=1 ); 
+    */ 
+
+    #loslegen{
+        position: absolute;
+        width: 100vw;
+        top:10vh;
+        text-align: center;
+    }
+}
+
+#start-bt{
+    height: 100%;
+    padding-left: 100px;
+    padding-right: 100px;
+    margin: 0px;
+    width: 100vw;
+}
+
+#start-bt .box-arround{
+    position: relative;
+    height: 9vh;
+    width: 100%;
+}
+
+#start-bt .box-arround .row{
+    height: 100%;
+    z-index: 5;
+}
+#start-bt .box-arround::after{
+    content:"";
+    position: absolute;
+    z-index: -1;
+    bottom: -8px;
+    right: -8px;
+    height: calc(100% - 9px);
+    width: calc(100% - 9px);
+    border: #000000 2px solid;
+    
+}
+
+#start-bt .box-arround{
+    text-align: center;
+    font-size: 0.6em;
+    color:white;
+    background-color: #4b6b21;
+}
+
+
+#loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom:0;
+    margin:auto;
+    border: 12px solid #00000069; 
+    border-top: 12px solid #ffffff94; 
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    transform: rotate(0deg);
+    animation: spin 1.3s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.quiz_content {
+    position: absolute;
+    left:0;right:0;top:0;bottom:0;
+    height: 100vh;
+    width:100vw;
+    background: #050211;
+    background: -moz-radial-gradient(center, ellipse cover, #0a082b 0%, #000000 100%);
+    background: -webkit-radial-gradient(center, ellipse cover, #0a082b 0%,#000000 100%);
+    background: radial-gradient(ellipse at center, #0a082b 0%,#000000 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0a082b', endColorstr='#000000',GradientType=1 );
+    opacity: 0;
+    animation: bg_q 1s ease-in-out forwards;
+    
+
+}
+@keyframes bg_q {
+    0% {     
+        opacity: 0;
+    }
+    100% { 
+        opacity: 1;
+    }
+}
+
+#go_back {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    height: 20px;
+    width: 40px;
+    color: white;
+    padding: 35px;
+    text-align: center;
+    line-height: 20px;
+
+}
+
+
+/* 
+-----------------------------
+
+user startseite 
+
+-----------------------------
+*/
+
+.user_home {
+    height: 100vh;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+
+.user_home > div {
+    // height: 100vh;
+    margin: 0px;
+}
+
+.user_home #header {
+
+    height: 30vh;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 0.8em;
+    line-height: 0.8em;
+}
+
+.user_home #header h1{
+    font-size: 1.3em;
+    font-weight: normal;
+}
+.user_home #header h2{
+    font-size: 0.7em;
+    line-height: 1.5em;
+    font-weight: normal;
+    margin-top: 30px;
+    margin-bottom:30px;
+}
+.user_home #chose {
+    height: 45vh;
+    /* margin-top: 5vh;
+    margin-bottom: 5vh; */
+    text-align: center;
+    font-size: 0.6em;
+    font-weight: bold;
+    margin-right: 18%;
+    margin-left: 18%;
+    padding-right: 10px;
+}
+.user_home #chose .box-arround{
+    position: relative;
+    height: 9vh;
+    width: 100%;
+    /* transform: translateY(0px); */
+}
+
+.user_home #chose .box-arround .row{
+    height: 100%;
+    z-index: 5;
+  
+}
+.user_home #chose .box-arround::after{
+    content:"";
+    position: absolute;
+    z-index: -1;
+    bottom: -8px;
+    right: -8px;
+    height: calc(100% - 9px);
+    width: calc(100% - 9px);
+    border: #000000 2px solid;
+}
+.user_home #chose .btn-active .box-arround::after{
+    background-color: #000000;
+}
+
+
+.user_home #btn-01 .box-arround{
+    background-color: #95b563;
+}
+.user_home #btn-02 .box-arround{
+    background-color: #9595fe;
+}
+.user_home #btn-03 .box-arround{
+    background-color: #ff6d72;
+}
+.user_home #btn-04 .box-arround{
+    background-color: #fffd6d;
+}
+
+ .menu_arround{
+    position: fixed;
+    width: 100%;
+    bottom: 0px;
+    font-size: 0.5em;
+    height:60px;
+    background-color: white;
+
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    justify-content: center; 
+    
+}
+ menu{
+    // width: 150px;
+    margin-bottom: 16px;
+    width: auto;
+    text-align: center;
+    padding: 0px;
+    position: relative;
+}
+ menu::before{
+    position: absolute;
+    content: " ";
+    height: 7px;
+    width: 100%;
+    top: -70%;
+    left: 0px;
+    background-color: #242424;
+}
+ menu::after{
+    position: absolute;
+    content: " ";
+    height: 7px;
+    width: 100%;
+    bottom: -70%;
+    left: 0px;
+    background-color: #242424;
+}
+
+ #back{
+    margin-bottom: 0px;
+    height: 30px;
+    width: 30px;
+    padding: 0px;
+    left: 40px;
+    position: absolute;
+}
+ #back::before{
+    position: absolute;
+    content: " ";
+    height: 6px;
+    width: 15px;
+    top: 15px;
+    left: 5px;
+    background-color: #242424;
+    transform: rotate(40deg);
+}
+ #back::after{
+    position: absolute;
+    content: " ";
+    height: 6px;
+    width: 15px;
+    top: 9px;
+    left: 5px;
+    background-color: #242424;
+    transform: rotate(-40deg);
+}
+
+
+
+/* 
+-----------------------------
+
+user galerie
+
+-----------------------------
+*/
+
+
+
+.user_home .tabs{
+    margin-bottom: 70px;
+}
+.tabs__controls {
+    
+    font-size: 15px;
+    margin-right: 10px;
+
+}
+
+.tabs__content{
+
+
+    .tabs__section{
+
+        padding:0px;
+
+    }
+
+    .col-xs-6,
+    .col-xs-12{
+        padding: 5px;
+    }
+
+    .around-xs{
+        margin:0px
+    }
+
+    .item{
+
+        text-align: left;
+        margin-bottom: 15px;
+
+        img{
+            max-width: 100%;
+            max-height: 80vh;
+            min-height: 100px;
+        }
+
+        h2{
+            margin: 5px 0px 5px 10px;
+            font-size: 1rem;
+        }
+
+        p{
+            margin: 0px 5px 0px 10px;
+            font-size: 13px;
+            line-height: 19px;
+        }
+    }
+    
+}
+
+
+/* 
+-----------------------------
+
+user Map Control
+
+-----------------------------
+*/
+
+.user_map {
+    height: 100vh;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    bottom: 0px;
+    left: 0px;
+}
+.user_map #linkMaps{
+    font-size: 0.5em;
+    width: 60vw;
+    padding: 5vw;
+    margin: 5vw 15vw 0vw 15vw;
+    background-color: cadetblue;
+    border-radius: 10px;
+    text-align: center;
+    position: absolute;
+    z-index: 3;
+    a{
+    color: white;
+    text-decoration: none;
+    }
+}
+.user_map .controls {
+    position: absolute;
+    width: 100vw;
+    height:100vh;
+    margin:0px;
+    // margin-bottom:70px;
+    overflow:hidden;
+}
+
+.user_map #controls_box{
+    width: 100%;
+}
+
+.user_map #controls_box .box-arround > .row{
+   height:80px;
+}
+
+#zoom_controls{
+    font-size: 0.6em;
+    .controller{
+        padding: 5vw;
+        color: white;
+        background-color: rgb(175, 175, 175);
+        border-radius: 10px;
+    }
+}
+
+#btn_up, #btn_left, #btn_right, #btn_down{
+    height:60px;
+}
+
+.user_map .controls .controller{
+    svg{
+        height: 40px;
+        width: 40px;
+        path{
+            fill: #434549;
+        }
+    }
+}

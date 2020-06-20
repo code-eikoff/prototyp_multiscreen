@@ -1,0 +1,24 @@
+{
+  "name": "ba",
+  "version": "1.0.0",
+  "description": "webbasierte multiscreen interaktion",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon server/server.js"
+  },
+  "author": "eiko eickhoff",
+  "license": "ISC",
+  "dependencies": {
+    "dom-parser": "^0.1.6",
+    "express": "^4.17.1",
+    "flexboxgrid": "^6.3.1",
+    "socket.io": "^2.3.0",
+    "tabs-slider": "^1.2.2",
+    "xmlhttprequest": "^1.8.0",
+    "xwiper": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3",
+    "xml2js": "^0.4.23"
+  }
+}

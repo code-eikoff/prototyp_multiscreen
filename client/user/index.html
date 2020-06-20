@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="/node_modules/flexboxgrid/css/flexboxgrid.min.css" type="text/css" />
+  <link rel="stylesheet" href="css/tabs.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <div id="content">
+
+    <h1 id="loslegen">Drücke Start um loszulegen</h1>
+    <div class="row center-xs middle-xs around-xs" id="start-bt">
+      <div class="col-xs-12">
+        <div class="box box-arround">
+          <div class="row middle-xs center-xs">
+            <div class="col-xs-12">
+              <div class="box">
+                <div id="los">Start</div>
+                <div id=loader class="hidden"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="http://eikoff:3030/socket.io/socket.io.js"></script>
+  <script src="xwiper.js"></script>
+  <script src="js/tabsSlider.js"></script>
+  <script src="script.js"></script>
+
+</body>
+
+</html>
