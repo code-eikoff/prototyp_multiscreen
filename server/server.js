@@ -12,7 +12,7 @@ const link_user = link_host + "/client/user/";
 const link_host_base = "client/host/";
 
 
-const options = ["home", "opt_1", "opt_map", "opt_3", "opt_4"];
+const options = ["home", "Kaiserpfalz", "Lageplan", "Quiz", "Themenübersicht"];
 
 const socket_host = io.of("/host");
 const socket_user = io.of("/user");
@@ -71,14 +71,13 @@ socket_host.on("connection", (socket) => {
   //wenn der Host sich trennt
   socket.on("disconnect", () => {
     client_hosts.pop(socket);
-    fs.unlink(`${room}.html`, (err) => {
-      if (err) {
-        console.error(err)
-        return
-      }
+    // fs.unlink(`${room}.html`, (err) => {
+    //   if (err) {
+    //     console.error(err)
+    //     return
+    //   }
+    // })
 
-      //file removed
-    })
   });
 });
 
@@ -116,7 +115,7 @@ socket_user.on("connection", (socket) => {
     socket_host.to(room).emit("verbunden");
   });
 
-  // Wenn der Nutzer start drückt
+  // Wenn der Nutzer start drückt um Interaktion zu starten
   socket.on("start", () => {
     socket_user.to(room).emit('load_options', options);
     socket_host.to(room).emit('load_options', options);
@@ -125,7 +124,7 @@ socket_user.on("connection", (socket) => {
     socket_host.to(room).emit("load_content", link_host_base + "index.html");
   });
 
-  // wenn ein button geklickt wird
+  // wenn ein button der Themen-Auswahl im Hauptmenü geklickt wird
   socket.on("btn_click", (option, slide) => {
     // if (slide) {
     //   socket_user.to(room).emit('set_slide', slide);
@@ -133,12 +132,12 @@ socket_user.on("connection", (socket) => {
     // }
 
     switch (option) {
-      case options[0]:
+      case options[0]: //"home"
         socket_user.to(room).emit('load_content', `${options[0]}.html`, options[0]);
         socket_host.to(room).emit("load_content", `${link_host_base}index.html`, options[0]);
 
         break;
-      case options[1]:
+      case options[1]: //"kaiserpf"
 
         if (slide) {
           socket_user.to(room).emit('load_content', `${options[1]}.html`, options[1], slide);
@@ -150,11 +149,11 @@ socket_user.on("connection", (socket) => {
 
         }
         break;
-      case options[2]:
+      case options[2]: //"lageplan"
         socket_user.to(room).emit('load_content', `${options[2]}.html`, options[2]);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[2]}.html`, options[2]);
         break;
-      case options[3]:
+      case options[3]: //"quiz"
         socket_user.to(room).emit('load_content', `${options[3]}.html`, options[3]);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[3]}.html`, options[3]);
         break;
@@ -231,7 +230,6 @@ socket_user.on("connection", (socket) => {
             socket_host.to(room).emit("getrennt");
             user_in_room.pop(user_in_room[i]);
           }
-
           // console.log(`user disconnect in "${room}"`);
         }
       }

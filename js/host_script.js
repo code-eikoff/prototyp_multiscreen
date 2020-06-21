@@ -84,19 +84,30 @@ function initContent(name, slide) {
       currentSlideIndex = 0;
       break;
 
-    case options[1]:
+    case "Kaiserpfalz":
       if (slide) currentSlideIndex = slide;
       setTimeout(initOpt01, 400);
       break;
 
-    case (options[1] + '_details'):
+    case ('Kaiserpfalz_details'):
       if (slide) currentSlideIndex = slide;
       setTimeout(initOpt01, 400);
       break;
 
-    case options[2]: //Lageplan
+    case "Lageplan": //Lageplan
       setTimeout(initOptMap, 400);
       console.log('mymap');
+
+    case "Quiz":
+      // setTimeout(initOptMap, 400);
+      // console.log('mymap');
+      break;
+
+    case "Themenübersicht":
+      // setTimeout(initOptMap, 400);
+      // console.log('mymap');
+      break;
+
 
     // wenn nichts definiert wird --> zurück zum hauptmenü
     default:

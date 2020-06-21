@@ -113,12 +113,15 @@ function initHome() {
 
   currentMenuName = options[0];
 
-  btn_opt_1 = document.getElementById("btn-01");
-  btn_opt_2 = document.getElementById("btn-02");
-  btn_opt_3 = document.getElementById("btn-03");
+  btn_opt_1 = document.getElementById("btn-1");
+  btn_opt_2 = document.getElementById("btn-2");
+  btn_opt_3 = document.getElementById("btn-3");
+  btn_opt_4 = document.getElementById("btn-4");
 
-  //Galerie
+  //Kaiserpfalr Galerie
   if (btn_opt_1) {
+    let ueb = btn_opt_1.getElementsByClassName("text_ueb");
+    ueb[0].innerHTML = options[1];
     btn_opt_1.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       btn_opt_1.classList.add("btn-active");
@@ -128,6 +131,8 @@ function initHome() {
 
   //Lageplan
   if (btn_opt_2) {
+    let ueb = btn_opt_2.getElementsByClassName("text_ueb");
+    ueb[0].innerHTML = options[2];
     btn_opt_2.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       btn_opt_2.classList.add("btn-active");
@@ -137,10 +142,24 @@ function initHome() {
 
   //Quiz
   if (btn_opt_3) {
+    let ueb = btn_opt_3.getElementsByClassName("text_ueb");
+    ueb[0].innerHTML = options[3];
     btn_opt_3.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       btn_opt_3.classList.add("btn-active");
       btnClick(options[3]);
+
+    });
+  }
+
+  //Themenübersicht
+  if (btn_opt_4) {
+    let ueb = btn_opt_4.getElementsByClassName("text_ueb");
+    ueb[0].innerHTML = options[4];
+    btn_opt_4.addEventListener("click", (e) => {
+      e.stopImmediatePropagation();
+      btn_opt_4.classList.add("btn-active");
+      btnClick(options[4]);
 
     });
   }
