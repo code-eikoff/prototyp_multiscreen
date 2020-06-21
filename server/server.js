@@ -36,8 +36,11 @@ let client_users = [];
 let user_in_room = [];
 
 /*
+
 -----  H O S T   C O N N E C T I O N  -----
+
 */
+
 socket_host.on("connection", (socket) => {
   client_hosts.push(socket); //host wird im array gespeichert
   // let room = 'room'+client_hosts.length;
@@ -47,17 +50,39 @@ socket_host.on("connection", (socket) => {
   user_in_room.push([room, 0]);
   socket.join(room);
 
+  var htmlContent = `<script>window.location='/client/user/index.html#${room}'</script>`;
+
+  try {
+    if (fs.existsSync(`${room}.html`)) {
+      //file exists
+    } else {
+      fs.writeFile(`${room}.html`, htmlContent, (error) => { console.log(error) });
+    }
+  } catch (err) {
+    console.error(err)
+  }
+
   socket.on("getQRCode", () => {
-    let qrcode_img = getQRcode("http://" + link_user + "#" + room);
+    let qrcode_img = getQRcode("http://" + link_user + "index.html#" + room);
     // socket_host.to(room).emit("qrimg", qrcode_img, link_user + "#" + room); //schicke qr-code img
-    socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room); //schicke qr-code img
+    socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + '.html'); //schicke qr-code img
   });
 
   //wenn der Host sich trennt
   socket.on("disconnect", () => {
     client_hosts.pop(socket);
+    fs.unlink(`${room}.html`, (err) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+
+      //file removed
+    })
   });
 });
+
+
 
 /*
 ===========================================
@@ -207,7 +232,7 @@ socket_user.on("connection", (socket) => {
             user_in_room.pop(user_in_room[i]);
           }
 
-          console.log(`user disconnect in "${room}"`);
+          // console.log(`user disconnect in "${room}"`);
         }
       }
     }
