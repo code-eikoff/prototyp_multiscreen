@@ -1,6 +1,6 @@
 const io = require("socket.io")(3030);
 const fs = require("fs");
-// const parseString = require("xml2js").parseString;
+const parseString = require("xml2js").parseString;
 // const xml2js = require("xml2js");
 // var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
@@ -17,7 +17,6 @@ const options = ["home", "Kaiserpfalz", "Lageplan", "Quiz", "Themenübersicht"];
 const socket_host = io.of("/host");
 const socket_user = io.of("/user");
 
-// let number = getNumber();
 let client_hosts = [];
 let client_users = [];
 
@@ -34,6 +33,7 @@ let client_users = [];
 // }
 
 let user_in_room = [];
+let quiz_sessions = [];
 
 /*
 
@@ -68,6 +68,9 @@ socket_host.on("connection", (socket) => {
     socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + '.html'); //schicke qr-code img
   });
 
+
+
+
   //wenn der Host sich trennt
   socket.on("disconnect", () => {
     client_hosts.pop(socket);
@@ -79,6 +82,8 @@ socket_host.on("connection", (socket) => {
     // })
 
   });
+
+
 });
 
 
@@ -94,6 +99,7 @@ User verbindet sich
 socket_user.on("connection", (socket) => {
   client_users.push(socket);
   let room;
+  let quiz_id;
 
   socket.on("user_connect", (r) => {
     room = r;
@@ -124,12 +130,10 @@ socket_user.on("connection", (socket) => {
     socket_host.to(room).emit("load_content", link_host_base + "index.html");
   });
 
+
+
   // wenn ein button der Themen-Auswahl im Hauptmenü geklickt wird
   socket.on("btn_click", (option, slide) => {
-    // if (slide) {
-    //   socket_user.to(room).emit('set_slide', slide);
-    //   socket_host.to(room).emit("set_slide", slide);
-    // }
 
     switch (option) {
       case options[0]: //"home"
@@ -167,6 +171,8 @@ socket_user.on("connection", (socket) => {
     }
 
   });
+
+
 
   socket.on("slideChange", (slideNr) => {
     socket_user.to(room).emit('change_Slide', slideNr);
@@ -206,9 +212,33 @@ socket_user.on("connection", (socket) => {
         socket_host.to(room).emit('zoom', "out");
         break;
       default:
-        console.log("out of options... in mapPan");
+        console.log("out of options... in mapControl");
     }
   });
+
+
+  socket.on("neueQuizSession", () => {
+
+    neueQuizSession(room, 4);
+    setTimeout(() => {
+      console.log(quiz_sessions[0]);
+    }, 1000);
+
+  });
+
+  socket.on("starteQuizSession", (nummer) => {
+    console.log(quiz_sessions[nummer]);
+
+  });
+
+
+  socket.on("neueFrage", () => {
+
+
+  });
+
+
+
 
 
   // nur zum Testen
@@ -235,15 +265,13 @@ socket_user.on("connection", (socket) => {
       }
     }
   });
+
+
+
 });
 
-function getHTMLText(link) {
-  fs.readFile(link, "utf-8", (err, data) => {
-    if (err) console.log(err);
-    console.log(data);
-    return data;
-  });
-}
+
+
 
 /*
 erstelle ein QRCode-Link als Bild
@@ -267,6 +295,79 @@ function makeid(length) {
 
   return result;
 }
+
+
+
+
+function neueQuizSession(room, fragen_anzahl) {
+
+  let quiz_id = makeid(6);
+  let quiz_session_number = quiz_sessions.length;
+  let fragen = [];
+
+  for (var i = 0; i < fragen_anzahl; i++) {
+    fragen.push(getFrageAntwort(i));
+  }
+
+  quiz_session = { ID: quiz_id, Room: room, SessionNumber: quiz_session_number, Fragen: fragen };
+
+  quiz_sessions.push(quiz_session);
+
+  socket_user.to(room).emit('QuizSessionBereit', quiz_session_number);
+  // socket_host.to(room).emit('QuizSession', quiz_session_number);
+
+}
+
+
+
+function getFrageAntwort(n) {
+  let fa = { frage_nummer: n, frage: "?", antworten: [], correct: 0 };
+
+  try {
+    if (fs.existsSync(`server/quiz.xml`)) {
+      fs.readFile("server/quiz.xml", "utf-8", (err, data) => {
+
+        if (err) console.log(err);
+
+        parseString(data, (err, result) => {
+          if (err) console.log(err);
+          var json = result;
+
+          fa.frage = json.quiz.item[n].question.toString();
+          for (var i = 0; i < 4; i++) {
+            if (json.quiz.item[n].answer[i].$) {
+              if (json.quiz.item[n].answer[i].$.correct) {
+                fa.correct = i;
+                fa.antworten.push(json.quiz.item[n].answer[i]._);
+              } else {
+                fa.antworten.push(json.quiz.item[n].answer[i].$);
+              }
+            } else {
+              fa.antworten.push(json.quiz.item[n].answer[i]);
+            }
+          }
+        });
+      });
+
+    } else {
+      console.error("nicht vorhanden");
+    }
+  } catch (err) {
+    console.error(err);
+  }
+
+  return fa;
+
+}
+
+
+// function getHTMLText(link) {
+//   fs.readFile(link, "utf-8", (err, data) => {
+//     if (err) console.log(err);
+//     console.log(data);
+//     return data;
+//   });
+// }
 
 // io.on("connection", (socket) => {
 //   if (io.engine.clientsCount <= 1) socket.emit("qrlink", link_click);
@@ -312,3 +413,6 @@ function makeid(length) {
 //     });
 //   });
 // }
+
+
+

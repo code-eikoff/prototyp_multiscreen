@@ -12,14 +12,7 @@ let frage,
 io.on("connection", (socket) => {
   console.log("Connections: " + io.engine.clientsCount);
 
-  // if(io.engine.clientsCount <= 1)  socket.emit('qrlink', link_click);
 
-  // socket.on( 'antwort', antwort_nummer => {
-  //   antwort_nummer = Number(antwort_nummer);
-  //   console.log("antw: " + antwort_nummer);
-  // socket.broadcast.emit('show_number', number);
-  // socket.emit('number', number);
-  // });
 
   socket.on("frage", () => {
     leseFrage(1);
@@ -27,20 +20,6 @@ io.on("connection", (socket) => {
     socket.emit("lade_frage", frage);
   });
 
-  // socket.on( 'request', url_s => {
-  //   console.log("url: " + url_s);
-  //   socket.broadcast.emit('show_number', number);
-  //   socket.emit('number', number);
-  // });
-
-  socket.on("disconnect", () => {
-    // console.log(io.engine.clientsCount);
-    // if ( io.engine.clientsCount <=1 ) {
-    //   saveNumber(number);
-    //   socket.broadcast.emit('qrlink', link_click);
-    //   console.log("x");
-    // }
-  });
 });
 
 function leseFrage(n) {

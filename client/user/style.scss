@@ -124,29 +124,6 @@ h1, h2, h3, h4 {
     100% { transform: rotate(360deg); }
 }
 
-.quiz_content {
-    position: absolute;
-    left:0;right:0;top:0;bottom:0;
-    height: 100vh;
-    width:100vw;
-    background: #050211;
-    background: -moz-radial-gradient(center, ellipse cover, #0a082b 0%, #000000 100%);
-    background: -webkit-radial-gradient(center, ellipse cover, #0a082b 0%,#000000 100%);
-    background: radial-gradient(ellipse at center, #0a082b 0%,#000000 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0a082b', endColorstr='#000000',GradientType=1 );
-    opacity: 0;
-    animation: bg_q 1s ease-in-out forwards;
-    
-
-}
-@keyframes bg_q {
-    0% {     
-        opacity: 0;
-    }
-    100% { 
-        opacity: 1;
-    }
-}
 
 #go_back {
     position: fixed;
@@ -253,6 +230,25 @@ user startseite
 }
 .user_home #btn-4 .box-arround{
     background-color: #fffd6d;
+}
+
+.user_home #chose .text_ueb{
+    opacity: 0;
+    transition: .4s ease-in-out;
+}
+
+
+.user_home #btn-1 .text_ueb{
+    transition-delay: 0s;
+}
+.user_home #btn-2 .text_ueb{
+    transition-delay: 0.1s;
+}
+.user_home #btn-3 .text_ueb{
+    transition-delay: 0.2s;
+}
+.user_home #btn-4 .text_ueb{
+    transition-delay: 0.3s;
 }
 
  .menu_arround{
@@ -467,3 +463,38 @@ user Map Control
         }
     }
 }
+
+
+/*
+====================================
+
+Quiz Content
+
+====================================
+*/
+
+
+.quiz_content {
+    position: absolute;
+    left:0;right:0;top:0;bottom:0;
+    width:100vw;
+    height: 100vh;
+    overflow: hidden;
+    // background: #050211;
+    // background: -moz-radial-gradient(center, ellipse cover, #0a082b 0%, #000000 100%);
+    // background: -webkit-radial-gradient(center, ellipse cover, #0a082b 0%,#000000 100%);
+    // background: radial-gradient(ellipse at center, #0a082b 0%,#000000 100%);
+    // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0a082b', endColorstr='#000000',GradientType=1 );
+    // opacity: 0;
+    // animation: bg_q 1s ease-in-out forwards;
+    
+
+}
+// @keyframes bg_q {
+//     0% {     
+//         opacity: 0;
+//     }
+//     100% { 
+//         opacity: 1;
+//     }
+// }

@@ -99,6 +99,12 @@ function initContent(name, slide) {
       backButtonLoc = options[0];
       setTimeout(initMapController, 300);
       break;
+
+    case options[3]: //Quiz
+      backButtonLoc = options[0];
+      setTimeout(initQuiz, 300);
+      break;
+
     // wenn nichts definiert wird --> zurück zum hauptmenü
     default:
       setTimeout(initHome, 300);
@@ -122,6 +128,7 @@ function initHome() {
   if (btn_opt_1) {
     let ueb = btn_opt_1.getElementsByClassName("text_ueb");
     ueb[0].innerHTML = options[1];
+    ueb[0].style.opacity = 1;
     btn_opt_1.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       btn_opt_1.classList.add("btn-active");
@@ -133,6 +140,7 @@ function initHome() {
   if (btn_opt_2) {
     let ueb = btn_opt_2.getElementsByClassName("text_ueb");
     ueb[0].innerHTML = options[2];
+    ueb[0].style.opacity = 1;
     btn_opt_2.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       btn_opt_2.classList.add("btn-active");
@@ -144,6 +152,7 @@ function initHome() {
   if (btn_opt_3) {
     let ueb = btn_opt_3.getElementsByClassName("text_ueb");
     ueb[0].innerHTML = options[3];
+    ueb[0].style.opacity = 1;
     btn_opt_3.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       btn_opt_3.classList.add("btn-active");
@@ -156,6 +165,7 @@ function initHome() {
   if (btn_opt_4) {
     let ueb = btn_opt_4.getElementsByClassName("text_ueb");
     ueb[0].innerHTML = options[4];
+    ueb[0].style.opacity = 1;
     btn_opt_4.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       btn_opt_4.classList.add("btn-active");
@@ -403,6 +413,68 @@ function setTabbarOffset() {
   e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
 
 }
+
+
+
+
+
+
+/*
+=============================
+
+Quiz
+
+================================
+*/
+
+
+function initQuiz() {
+
+  socket.emit("neueQuizSession");
+  const antworten = document.getElementsByClassName("antw");
+
+
+  antworten[0].addEventListener("click", (e) => {
+
+    e.stopImmediatePropagation();
+    socket.emit("antwort", "0");
+  });
+  antworten[1].addEventListener("click", (e) => {
+    e.stopImmediatePropagation();
+    socket.emit("antwort", "1");
+  });
+  antworten[2].addEventListener("click", (e) => {
+    e.stopImmediatePropagation();
+    socket.emit("antwort", "2");
+  });
+  antworten[3].addEventListener("click", (e) => {
+    e.stopImmediatePropagation();
+    socket.emit("antwort", "3");
+  });
+
+
+  socket.on("QuizSessionBereit", (nr) => {
+    document.getElementById("antworten").addEventListener("click", (e) => {
+      socket.emit("starteQuizSession", nr);
+    });
+  });
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /*===================

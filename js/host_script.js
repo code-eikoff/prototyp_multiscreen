@@ -243,3 +243,22 @@ function setTabbarOffset() {
 
 }
 
+
+
+// socket.on("lade_frage", (data) => {
+//   var xhr = new XMLHttpRequest();
+//   xhr.open("GET", "quiz_frage.html", true);
+//   xhr.onreadystatechange = function () {
+//     if (this.readyState !== 4) return;
+//     if (this.status !== 200) return;
+//     parser = new DOMParser();
+//     var doc = parser.parseFromString(this.responseText, "text/html");
+//     doc.querySelector("#frage").innerHTML = data;
+//     console.log(doc);
+//     let content = document.getElementById("content");
+//     content.innerHTML = new XMLSerializer().serializeToString(
+//       doc.querySelector("body")
+//     );
+//   };
+//   xhr.send();
+// });

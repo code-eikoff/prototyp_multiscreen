@@ -1,34 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'>
     <title>quiz</title>
 
 </head>
+
 <body>
     <div id="content_html" class="quiz_content">
-    <link href="quiz_style.css" type="text/css" media="print"/>
-    <div id="frage" >
-        ?
-    </div>
+        <link href="quiz_style.css" type="text/css" media="print" />
 
-    <div id="antworten" >
-        <div class="antwort" >
-            0
-        </div>
-        <div class="antwort" >
-            1
-        </div>
-        <div class="antwort" >
-            2
-        </div>
-        <div class="antwort" >
-            3
-        </div>
-    </div>
 
-    <script src="quiz_user.js"></script>
-</div>
+        <div class="controls row center-xs middle-xs" id="antworten">
+            <div class="row center-xs middle-xs around-xs" id="controls_box">
+
+                <div class="col-xs-12" id="fragen">
+                    <div class="box box-arround">
+                        <div class="row middle-xs center-xs">
+                            <div class="col-xs-4">
+                                <div class="box">
+                                    <div class="row middle-xs center-xs" id="btn_up">
+                                        <div class="col-xs-12">
+                                            <div class="box" id="frage">
+                                                ?
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12" id="antrorten_u">
+                    <div class="box box-arround">
+                        <div class="row middle-xs center-xs around-xs">
+                            <div class="col-xs-4">
+                                <div class="box">
+                                    <div class="row middle-xs center-xs" id="btn_left">
+                                        <div class="col-xs-12">
+                                            <div class="box antw">
+                                                a
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="row middle-xs center-xs" id="btn_right">
+                                    <div class="col-xs-12">
+                                        <div class="box antw">
+                                            b
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-12" id="antrorten_d">
+                    <div class="box box-arround">
+                        <div class="row middle-xs center-xs around-xs">
+                            <div class="col-xs-4">
+                                <div class="box">
+                                    <div class="row middle-xs center-xs" id="btn_left">
+                                        <div class="col-xs-12">
+                                            <div class="box antw">
+                                                c
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-xs-4">
+                                <div class="row middle-xs center-xs" id="btn_right">
+                                    <div class="col-xs-12">
+                                        <div class="box antw">
+                                            d
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="menu_arround" id="menu">
+            <div id="back"></div>
+            <menu>
+                <div class="box">MENÜ</div>
+            </menu>
+        </div>
+
+
+
+        <script src="quiz_user.js"></script>
+    </div>
 </body>
+
 </html>
