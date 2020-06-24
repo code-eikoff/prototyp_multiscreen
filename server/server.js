@@ -12,10 +12,13 @@ const link_user = link_host + "/client/user/";
 const link_host_base = "client/host/";
 
 
-const options = ["home", "Kaiserpfalz", "Lageplan", "Quiz", "Themenübersicht"];
+const options = ["home", "Detailansicht", "Lageplan", "Quiz", "Themenübersicht"];
 
 const socket_host = io.of("/host");
 const socket_user = io.of("/user");
+
+const timer_quiz_frage = 20;
+const anzahlFragen = 2;
 
 let client_hosts = [];
 let client_users = [];
@@ -34,6 +37,7 @@ let client_users = [];
 
 let user_in_room = [];
 let quiz_sessions = [];
+let qs_geantwortet = [];
 
 /*
 
@@ -68,6 +72,16 @@ socket_host.on("connection", (socket) => {
     socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + '.html'); //schicke qr-code img
   });
 
+  socket.on("set_user_antworten", (nr) => {
+    setTimeout(() => {
+      let qs = quiz_sessions[nr];
+      let fnr = qs.FrageNr;
+      if (fnr < qs.Fragen.length) {
+        socket_user.to(qs.Room).emit('zeigeFrageAntwort', qs.Fragen[fnr], nr);
+      }
+    }, 2000);
+  });
+
 
 
 
@@ -98,8 +112,14 @@ User verbindet sich
 
 socket_user.on("connection", (socket) => {
   client_users.push(socket);
-  let room;
-  let quiz_id;
+  let room = "";
+  let room_nr = 0;
+  let quiz_nr = 0;
+  let geantwortet = false;
+  let punkte = 0;
+  let ready = true;
+  let readyF = true;
+
 
   socket.on("user_connect", (r) => {
     room = r;
@@ -112,6 +132,7 @@ socket_user.on("connection", (socket) => {
       for (i = 0; i < user_in_room.length; i++) {
         if (user_in_room[i][0] === room) {
           user_in_room[i][1]++;
+          room_nr = i;
           console.log(
             `new user in "${user_in_room[i][0]}": ${user_in_room[i][1]}`
           );
@@ -218,33 +239,113 @@ socket_user.on("connection", (socket) => {
 
 
   socket.on("neueQuizSession", () => {
+    if (ready) {
+      ready = false;
+      console.log("neueQuizSession");//ooooooooo
 
-    neueQuizSession(room, 4);
-    setTimeout(() => {
-      console.log(quiz_sessions[0]);
-    }, 1000);
-
-  });
-
-  socket.on("starteQuizSession", (nummer) => {
-    console.log(quiz_sessions[nummer]);
-
-  });
+      neueQuizSession(room, anzahlFragen);
+    }
 
 
-  socket.on("neueFrage", () => {
-
+    console.log("l " + quiz_sessions.length);
+    // setTimeout(() => {
+    //   console.log(quiz_sessions[0]);
+    // }, 1000);
 
   });
 
+  socket.on("starteQuizSession", (nr) => {
+
+    console.log("starteQuizSession");//ooooooooo
+
+    quiz_nr = nr;
+    let qs = quiz_sessions[nr];
+
+    qs_geantwortet.push([0, user_in_room[room_nr][1]]);
+
+    console.log(user_in_room[room_nr][1]);
+
+    socket_user.to(qs.Room).emit('platzhalter');
+    socket_host.to(qs.Room).emit('zeigeFrage', qs.Fragen[qs.FrageNr].frage, timer_quiz_frage, nr);
+  });
+
+  socket.on("starteNeueFrage", (nr) => {
+    // if (readyF) {
+    // readyF = false;
+    console.log("starteNeueFrage");//ooooooooo
+
+    let qs = quiz_sessions[nr];
+    qs_geantwortet[room_nr][0] = 0;
+    try {
+      let frage = qs.Fragen[qs.FrageNr].frage;
+      if (qs.FrageNr <= anzahlFragen) {
+        socket_user.to(qs.Room).emit('platzhalter');
+        socket_host.to(qs.Room).emit('zeigeFrage', frage, timer_quiz_frage, nr);
+
+      }
+    } catch (error) {
+      socket_host.to(qs.Room).emit("zeigeStatistik", "hier kommen die Statistiken hin");
+
+    }
 
 
+
+  });
+
+
+  socket.on("antwort", (antw, t, nr) => {
+
+    let ga = 0;
+    let ges = 1;
+    let qs = quiz_sessions[nr];
+
+
+    try {
+      let correctAntw = qs.Fragen[qs.FrageNr].correct;
+      if (!geantwortet) {
+
+        geantwortet = true;
+        qs_geantwortet[room_nr][0] += 1;
+        ga = qs_geantwortet[room_nr][0];
+        ges = user_in_room[room_nr][1];
+        console.log(ga + " " + ges);
+        if (correctAntw == antw) {
+          punkte += 300 - t;
+        }
+        console.log(ga + " von " + ges);
+
+      }
+      if (ga >= ges) {
+        readyF = true;
+
+        qs_geantwortet[room_nr][0] = 0;
+        geantwortet = false;
+
+        neueFage(nr);
+      }
+
+    } catch (err) {
+
+      readyF = true;
+
+      geantwortet = false;
+
+      socket_user.to(room).emit('load_content', `${options[0]}.html`, options[0]);
+      socket_host.to(room).emit("load_content", `${link_host_base}index.html`, options[0]);
+
+
+      console.error("error in Antwort: " + err)
+    }
+
+
+
+  });
 
 
   // nur zum Testen
-  socket.on("say", (t) => {
-    console.log(`user: "${t}"`);
-  });
+  // socket.on("say", (t) => {
+  //   console.log(`user say: "${t}"`);
+  // });
 
 
 
@@ -258,7 +359,20 @@ socket_user.on("connection", (socket) => {
           user_in_room[i][1] -= 1;
           if (user_in_room[i][1] < 1) {
             socket_host.to(room).emit("getrennt");
-            user_in_room.pop(user_in_room[i]);
+
+            try {
+              if (qs_geantwortet[room_nr][1]) {
+                qs_geantwortet[room_nr][1] -= 1;
+                user_in_room.pop(user_in_room[i]);
+              }
+              else {
+                user_in_room.pop(user_in_room[i]);
+              }
+            } catch (err) {
+              console.error(err)
+            }
+
+
           }
           // console.log(`user disconnect in "${room}"`);
         }
@@ -304,30 +418,54 @@ function neueQuizSession(room, fragen_anzahl) {
   let quiz_id = makeid(6);
   let quiz_session_number = quiz_sessions.length;
   let fragen = [];
+  let aktuelleFrageNr = 0;
 
   for (var i = 0; i < fragen_anzahl; i++) {
     fragen.push(getFrageAntwort(i));
   }
 
-  quiz_session = { ID: quiz_id, Room: room, SessionNumber: quiz_session_number, Fragen: fragen };
+  let quiz_session = { ID: quiz_id, Room: room, SessionNumber: quiz_session_number, Fragen: fragen, FrageNr: aktuelleFrageNr };
 
   quiz_sessions.push(quiz_session);
 
   socket_user.to(room).emit('QuizSessionBereit', quiz_session_number);
-  // socket_host.to(room).emit('QuizSession', quiz_session_number);
+
+}
+
+
+
+function neueFage(nr) {
+  let qs = quiz_sessions[nr];
+
+  qs.FrageNr += 1;
+
+  if (qs.FrageNr < qs.Fragen.length) {
+    console.log("socket_user.to(qs.Room).emit('neueFrageBereit')")
+    socket_user.to(qs.Room).emit('neueFrageBereit');
+
+    let correctAntw = qs.Fragen[qs.FrageNr - 1].correct;
+    socket_host.to(qs.Room).emit("zeigeFrageAntwort", qs.Fragen[qs.FrageNr - 1], correctAntw);
+
+
+  } else {
+    socket_user.to(qs.room).emit('zeigeStatistikSeite');
+    socket_host.to(qs.Room).emit("zeigeStatistik", "hier kommen die Statistiken hin");
+
+  }
 
 }
 
 
 
 function getFrageAntwort(n) {
+
   let fa = { frage_nummer: n, frage: "?", antworten: [], correct: 0 };
 
   try {
     if (fs.existsSync(`server/quiz.xml`)) {
       fs.readFile("server/quiz.xml", "utf-8", (err, data) => {
 
-        if (err) console.log(err);
+        if (err) console.err(err);
 
         parseString(data, (err, result) => {
           if (err) console.log(err);

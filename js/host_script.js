@@ -5,7 +5,7 @@ let backButtonLoc = 'home';
 
 let options = ["home"];
 
-console.time();
+// console.time();
 
 const socket = io("http://eikoff:3030/host");
 
@@ -15,7 +15,7 @@ socket.emit("getQRCode");
 // socket.on('number', data => number_div.innerHTML = data );
 
 socket.on("qrimg", (img, link, color) => {
-  console.timeEnd();
+  // console.timeEnd();
   document.getElementById("scan_me").classList.remove("hidden");
   let qrcode_div = document.getElementById("qrcode");
   qrcode_div.innerHTML = img + `<h3>${link}</h3>`;
@@ -37,13 +37,11 @@ socket.on("getrennt", () => location.reload());
 socket.on("load_options", (data) => options = data);
 
 socket.on("load_content", (html_link, name) => {
-  console.log(name);
   importContent(html_link, name);
   initContent(name);
 });
 
 socket.on("load_content", (html_link, name, slide) => {
-  console.log(name);
   importContent(html_link, name);
   initContent(name, slide);
 });
@@ -84,26 +82,25 @@ function initContent(name, slide) {
       currentSlideIndex = 0;
       break;
 
-    case "Kaiserpfalz":
+    case options[1]: //Detailansicht Kaiserpfalz
       if (slide) currentSlideIndex = slide;
       setTimeout(initOpt01, 400);
       break;
 
-    case ('Kaiserpfalz_details'):
+    case (`${options[1]}_details`)://Detailansicht Kaiserpfalz_details
       if (slide) currentSlideIndex = slide;
       setTimeout(initOpt01, 400);
       break;
 
-    case "Lageplan": //Lageplan
+    case options[2]: //Lageplan
       setTimeout(initOptMap, 400);
-      console.log('mymap');
-
-    case "Quiz":
-      // setTimeout(initOptMap, 400);
-      // console.log('mymap');
       break;
 
-    case "Themenübersicht":
+    case options[3]://Quiz
+      setTimeout(initQuiz, 400);
+      break;
+
+    case options[4]: //"Themenübersicht"
       // setTimeout(initOptMap, 400);
       // console.log('mymap');
       break;
@@ -245,20 +242,83 @@ function setTabbarOffset() {
 
 
 
-// socket.on("lade_frage", (data) => {
-//   var xhr = new XMLHttpRequest();
-//   xhr.open("GET", "quiz_frage.html", true);
-//   xhr.onreadystatechange = function () {
-//     if (this.readyState !== 4) return;
-//     if (this.status !== 200) return;
-//     parser = new DOMParser();
-//     var doc = parser.parseFromString(this.responseText, "text/html");
-//     doc.querySelector("#frage").innerHTML = data;
-//     console.log(doc);
-//     let content = document.getElementById("content");
-//     content.innerHTML = new XMLSerializer().serializeToString(
-//       doc.querySelector("body")
-//     );
-//   };
-//   xhr.send();
-// });
+function initQuiz() {
+  neueFrage = true;
+  socket.on("zeigeFrage", (frage, timer, nr) => {
+
+    if (!neueFrage) importContent("/client/host/Quiz.html");
+    setTimeout(() => {
+
+      let ready = true;
+      let f = document.getElementById("frage_box");
+      let seconds = (timer / 10) + 1;
+
+      f.innerHTML = String(seconds);
+
+      function tick() {
+        seconds--;
+        f.innerHTML = String(seconds);
+        if (seconds >= 1) {
+          setTimeout(tick, 1000);
+        }
+        else {
+          f.innerHTML = frage;
+          if (ready) {
+            ready = false;
+            socket.emit("set_user_antworten", nr);
+            neueFrage = true;
+          }
+        }
+      }
+
+      tick();
+    }, 300);
+
+
+  });
+
+
+
+
+
+  socket.on("zeigeFrageAntwort", (fa, correct) => {
+    console.log(neueFrage + " " + fa)
+    if (neueFrage) {
+      neueFrage = false;
+      importContent('/client/host/QuizAntwortenBtn.html');
+
+      setTimeout(initFragen, 1000);
+
+      function initFragen() {
+
+        let frage = document.getElementById('frage');
+        frage.innerHTML = fa.frage;
+
+        document.getElementById("content_html").style.visibility = "visible";
+
+        for (let i = 0; i < 4; i++) {
+
+          let a = document.getElementById(`btn_${i}`);
+          let a_text = document.getElementById(`antw_${i}`);
+          a_text.innerHTML = fa.antworten[i];
+          if (i == correct) a.getElementsByClassName("antw")[0].style.backgroundColor = "#7bc387";
+        }
+
+
+      }
+    }
+
+
+  });
+
+
+}
+
+
+socket.on("zeigeStatistik", (stats) => {
+
+  document.getElementById("content_html").innerHTML = stats;
+
+
+
+});

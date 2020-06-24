@@ -180,7 +180,6 @@ function initHome() {
 function initOpt01() {
 
   initMenu();
-  setTimeout(initScrollItems, 300);
   elem = document.querySelector('.tabs');
 
   tabs = new TabsSlider(elem, {
@@ -215,6 +214,8 @@ function initOpt01() {
     });
   }
 
+  setTimeout(initScrollItems, 300);
+
 }
 
 
@@ -246,12 +247,8 @@ function initMapController() {
 
 
 
-
-
-
-
-
 function initScrollItems() {
+  initMenu();
 
   let last_known_scroll_position = 0;
   let current_Item_in_view = 0;
@@ -289,10 +286,11 @@ function initScrollItems() {
   function isElementInViewport(el) {
     var rect = el.getBoundingClientRect();
     return (
-      rect.top + 200 >= 0 &&
+      rect.top + ((el.offsetHeight / 2) + 20) >= (window.innerHeight / 2) - 150 &&
       rect.left >= 0 &&
-      rect.top + 210 <= (window.innerHeight) &&
+      rect.bottom - ((el.offsetHeight / 2) - 20) <= (window.innerHeight / 2) + 150 &&
       rect.right <= (window.innerWidth)
+
     );
   }
 
@@ -429,35 +427,94 @@ Quiz
 
 
 function initQuiz() {
+  let qz_nr = 0;
+  let ready = true;
+  initMenu();
+  if (ready) {
+    ready = false;
+    socket.emit("neueQuizSession");
+  }
 
-  socket.emit("neueQuizSession");
-  const antworten = document.getElementsByClassName("antw");
-
-
-  antworten[0].addEventListener("click", (e) => {
-
-    e.stopImmediatePropagation();
-    socket.emit("antwort", "0");
-  });
-  antworten[1].addEventListener("click", (e) => {
-    e.stopImmediatePropagation();
-    socket.emit("antwort", "1");
-  });
-  antworten[2].addEventListener("click", (e) => {
-    e.stopImmediatePropagation();
-    socket.emit("antwort", "2");
-  });
-  antworten[3].addEventListener("click", (e) => {
-    e.stopImmediatePropagation();
-    socket.emit("antwort", "3");
-  });
 
 
   socket.on("QuizSessionBereit", (nr) => {
-    document.getElementById("antworten").addEventListener("click", (e) => {
-      socket.emit("starteQuizSession", nr);
+    qz_nr = nr;
+    let losBtn = document.getElementById("los");
+    losBtn.style.visibility = "visible";
+
+    let ready = true;
+    losBtn.addEventListener("click", (e) => {
+      if (ready) {
+        ready = false;
+        socket.emit("starteQuizSession", qz_nr);
+      }
     });
   });
+
+  socket.on("neueFrageBereit", () => {
+    ready = true;
+    importContent('quiz.html');
+    setTimeout(() => {
+      let losBtn = document.getElementById("los");
+
+      document.getElementById("los_text").innerHTML = "weiter";
+      losBtn.style.visibility = "visible";
+
+      losBtn.addEventListener("click", (e) => {
+        if (ready) {
+          ready = false;
+          socket.emit("starteNeueFrage", qz_nr);
+        }
+      });
+    }, 200);
+
+  });
+
+  socket.on("zeigeFrageAntwort", (fa, nr) => {
+    ready = true;
+    importContent('QuizAntwortenBtn.html');
+    setTimeout(initFragen, 1000);
+
+    function initFragen() {
+      let startTime, endTime;
+
+      function stopTime() {
+        endTime = performance.now();
+        var timeDiff = endTime - startTime;
+        timeDiff /= 100;
+        return Math.round(timeDiff);
+      }
+
+      let frage = document.getElementById('frage');
+      frage.innerHTML = fa.frage;
+
+      document.getElementById("content_html").style.visibility = "visible";
+
+      startTime = performance.now();
+
+      for (let i = 0; i < 4; i++) {
+        let a = document.getElementById(`btn_${i}`);
+        let a_text = document.getElementById(`antw_${i}`);
+        a_text.innerHTML = fa.antworten[i];
+        a.addEventListener("click", () => {
+          document.getElementById("content_html").innerHTML = "warten...";
+
+          socket.emit("antwort", i, stopTime(), nr);
+
+        });
+      }
+
+    }
+
+  });
+
+
+  socket.on("platzhalter", (fa) => {
+
+    document.getElementById("content_html").innerHTML = "warten...";
+
+  });
+
 
 }
 
@@ -512,7 +569,7 @@ xwiper.onSwipeRight(() => {
 
     // options[0] ist immer die startseite (das Hauptmenü)
     case options[1]:
-      nextSlide();
+      prevSlide();
       break;
 
     case options[2]:
@@ -569,6 +626,8 @@ xwiper.onSwipeDown(() => {
 
 
 xwiper.onTap(() => socket.emit('say', 'tap'));
+
+
 
 // Remove listener
 // xwiper.destroy();

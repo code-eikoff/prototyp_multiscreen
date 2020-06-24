@@ -360,4 +360,78 @@ Galerie
 #mapid {
   height: 100vh;
 }
+
+/* 
+-----------------------------
+
+Quiz
+
+-----------------------------
+*/
+#quizIntro {
+  height: 100vh;
+}
+
+.quiz_content {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#frage_row {
+  margin-top: 20px;
+  font-size: 1.5rem;
+}
+
+#antrorten_o {
+  margin: 60px 0;
+}
+
+#btn_0 {
+  height: 100%;
+}
+
+#btn_0 .antw,
+#btn_1 .antw,
+#btn_2 .antw,
+#btn_3 .antw {
+  position: relative;
+  height: -webkit-fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 10px 5px;
+  font-size: 1.5rem;
+  line-height: 2rem;
+  text-align: center;
+  font-size: 0.6em;
+  color: #242424;
+  background-color: #dddddd;
+}
+
+#btn_0 .antw .row,
+#btn_1 .antw .row,
+#btn_2 .antw .row,
+#btn_3 .antw .row {
+  height: 100%;
+  z-index: 5;
+}
+
+#btn_0 .antw::after,
+#btn_1 .antw::after,
+#btn_2 .antw::after,
+#btn_3 .antw::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: -8px;
+  right: -8px;
+  height: calc(100% - 9px);
+  width: calc(100% - 9px);
+  border: #000000 2px solid;
+}
 /*# sourceMappingURL=style.css.map */
