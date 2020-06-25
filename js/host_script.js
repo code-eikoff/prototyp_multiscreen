@@ -38,12 +38,12 @@ socket.on("load_options", (data) => options = data);
 
 socket.on("load_content", (html_link, name) => {
   importContent(html_link, name);
-  initContent(name);
+  initContent(name, null);
 });
 
-socket.on("load_content", (html_link, name, slide) => {
+socket.on("load_content", (html_link, name, data) => {
   importContent(html_link, name);
-  initContent(name, slide);
+  initContent(name, data);
 });
 
 function importContent(link, name) {
@@ -74,7 +74,7 @@ function importContent(link, name) {
 }
 
 
-function initContent(name, slide) {
+function initContent(name, data) {
   switch (name) {
     // options[0] ist immer die startseite (das Hauptmenü)
 
@@ -83,12 +83,12 @@ function initContent(name, slide) {
       break;
 
     case options[1]: //Detailansicht Kaiserpfalz
-      if (slide) currentSlideIndex = slide;
+      if (data) currentSlideIndex = data;
       setTimeout(initOpt01, 400);
       break;
 
     case (`${options[1]}_details`)://Detailansicht Kaiserpfalz_details
-      if (slide) currentSlideIndex = slide;
+      if (data) currentSlideIndex = data;
       setTimeout(initOpt01, 400);
       break;
 
@@ -101,8 +101,10 @@ function initContent(name, slide) {
       break;
 
     case options[4]: //"Themenübersicht"
-      // setTimeout(initOptMap, 400);
-      // console.log('mymap');
+      setTimeout(() => {
+        initThemenueb(data);
+      }, 40);
+
       break;
 
 
@@ -318,17 +320,29 @@ function initQuiz() {
 
   });
 
+  socket.on("zeigeStatistik", (stats) => {
+    document.getElementById("content_html").innerHTML = stats;
+  });
 
 }
 
+function initThemenueb(themen) {
 
-socket.on("zeigeStatistik", (stats) => {
+  setTimeout(() => {
 
-  document.getElementById("content_html").innerHTML = stats;
+    for (let i = 1; i < 7; i++) {
+      if (themen) {
+        let a = document.getElementById(`ch-0${i}`);
+        let a_ueb = a.getElementsByTagName(`h2`)[0];
+        let a_text = a.getElementsByTagName(`p`)[0];
+        a_ueb.innerHTML = themen.Name[i - 1];
+        a_text.innerHTML = themen.Beschreibung[i - 1];
 
+      }
+    }
 
-
-});
+  }, 300);
+}
 
 
 socket.on("refresh", () => {

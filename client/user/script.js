@@ -44,11 +44,11 @@ socket.on("vibrate", (pattern) => {
 
 socket.on("load_options", (data) => options = data);
 
-socket.on("load_content", (html_link, name, slide) => {
+socket.on("load_content", (html_link, name, data) => {
 
   importContent(html_link);
   currentMenuName = name;
-  initContent(name, slide);
+  initContent(name, data);
 
 
 });
@@ -76,7 +76,7 @@ function importContent(link) {
 }
 
 
-function initContent(name, slide) {
+function initContent(name, data) {
 
   switch (name) {
     // options[0] ist immer die startseite (das Hauptmenü)
@@ -90,7 +90,7 @@ function initContent(name, slide) {
       break;
 
     case (options[1] + '_details'):
-      currentSlideIndex = slide;
+      currentSlideIndex = data;
       backButtonLoc = options[1];
       setTimeout(initOpt01, 300);
       break;
@@ -105,9 +105,18 @@ function initContent(name, slide) {
       setTimeout(initQuiz, 300);
       break;
 
-    case options[3]: //Themenübersicht
+    case options[4]: //Themenübersicht
       backButtonLoc = options[0];
-      setTimeout(initThemenueb, 300);
+      setTimeout(() => {
+        initThemenueb(data)
+      }, 300);
+      break;
+
+    case (`${options[4]}_details`): //Themenübersicht UnterMenü
+      backButtonLoc = `${options[4]}_d`;
+      setTimeout(() => {
+        initThema();
+      }, 300);
       break;
 
     // wenn nichts definiert wird --> zurück zum hauptmenü
@@ -354,6 +363,9 @@ function initBack() {
         case options[1]:
           btnClick(options[1], '0');
           break;
+        case `${options[4]}_d`:
+          btnClick(options[4], '0');
+          break;
         default:
           btnClick(options[0], '0');
 
@@ -590,22 +602,36 @@ function initQuiz() {
 
 
 
-function initThemenueb() {
-
+function initThemenueb(themen) {
 
   initMenu();
 
-  // socket.emit("neueQuizSession");
+  for (let i = 1; i < 7; i++) {
+    if (themen) {
+      let a = document.getElementById(`btn-${i}`);
 
-  // socket.on("", () => {
+      let ueb = a.getElementsByClassName("text_ueb")[0];
+      ueb.innerHTML = themen.Name[i - 1];;
+      ueb.style.opacity = 1;
+      a.addEventListener("click", (e) => {
+        e.stopImmediatePropagation();
+        a.classList.add("btn-active");
+        socket.emit("themaÖffnen", i - 1);
+      });
 
-  // });
+    }
+  }
 
 
 
 }
 
 
+function initThema() {
+
+  initMenu();
+
+}
 
 
 

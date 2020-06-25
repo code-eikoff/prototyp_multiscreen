@@ -12,7 +12,56 @@ const link_user = link_host + "/client/user/";
 const link_host_base = "client/host/";
 
 
-const options = ["home", "Detailansicht", "Lageplan", "Quiz", "Themenübersicht"];
+const options = [
+  "home",
+  "Detailansicht",
+  "Lageplan",
+  "Quiz",
+  "Themenübersicht"
+];
+
+const themenueb =
+{
+  Name: [],
+  Beschreibung: [],
+  Link: []
+}
+
+
+function ladeThemen() {
+
+  fs.readFile("server/themen.xml", "utf-8", (err, data) => {
+
+    if (err) {
+      console.log(err);
+    }
+    parseString(data, (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+      var json = result;
+      for (let i = 0; i < 6; i++) {
+        themenueb.Name[i] = json.Themenueb.Thema[i].$.Titel;
+        themenueb.Beschreibung[i] = json.Themenueb.Thema[i].Beschreibung.toString();
+        themenueb.Link[i] = json.Themenueb.Thema[i].Link.toString();
+
+      }
+
+    });
+  });
+
+}
+
+
+// setTimeout(
+//   () => {
+//     console.log(
+//       themenueb
+
+//     );
+//   }
+//   , 220);
+
 
 const socket_host = io.of("/host");
 const socket_user = io.of("/user");
@@ -48,6 +97,7 @@ let qs_geantwortet = [];
 */
 
 socket_host.on("connection", (socket) => {
+  ladeThemen();
   client_hosts.push(socket); //host wird im array gespeichert
   // let room = 'room'+client_hosts.length;
 
@@ -183,9 +233,9 @@ socket_user.on("connection", (socket) => {
         socket_user.to(room).emit('load_content', `${options[3]}.html`, options[3]);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[3]}.html`, options[3]);
         break;
-      case options[4]:
-        socket_user.to(room).emit('load_content', `${options[4]}.html`, options[4]);
-        socket_host.to(room).emit("load_content", `${link_host_base}${options[4]}.html`, options[4]);
+      case options[4]://themenübersicht
+        socket_user.to(room).emit('load_content', `${options[4]}.html`, options[4], themenueb);
+        socket_host.to(room).emit("load_content", `${link_host_base}${options[4]}.html`, options[4], themenueb);
         break;
 
       default:
@@ -366,15 +416,30 @@ socket_user.on("connection", (socket) => {
 
   });
 
+  function starteTimerStoppFrage(nr, qs) {
+    timer_qz = setTimeout(() => {
+      neueFage(nr, qs);
+    }, timer_next_qz);
+  }
 
-  // nur zum Testen
-  // socket.on("say", (t) => {
-  //   console.log(`user say: "${t}"`);
-  // });
+  function stopTimerQz() {
+    clearTimeout(timer_qz);
+  }
 
   socket.on("ladeStatistik", () => {
     socket.emit("zeigeStatistik", Math.round((punkte / 10)));
   });
+
+
+
+  // THEMENÜBERSICHT
+
+  socket.on("themaÖffnen", (i) => {
+    socket_user.to(room).emit('load_content', `details/${themenueb.Link[i]}`, `${options[4]}_details`);
+  });
+
+
+
 
 
   socket.on("disconnect", () => {
@@ -407,15 +472,7 @@ socket_user.on("connection", (socket) => {
     }
   });
 
-  function starteTimerStoppFrage(nr, qs) {
-    timer_qz = setTimeout(() => {
-      neueFage(nr, qs);
-    }, timer_next_qz);
-  }
 
-  function stopTimerQz() {
-    clearTimeout(timer_qz);
-  }
 
 });
 

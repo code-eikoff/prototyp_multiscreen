@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Themenueb>
+<Thema Titel="Kaiserpfalz">
+  <Link>pfalz.html</Link>
+  <Beschreibung>Die Kaiserpfalz Goslar umfasst ein Areal von etwa 340 mal 180 Metern, gelegen am Fuße des Rammelsbergs im Süden der Stadt Goslar, auf dem sich im Wesentlichen das Kaiserhaus, das ehemalige Kollegiatstift „St. Simon und ...</Beschreibung>
+</Thema>
+<Thema Titel="Marktplatz">
+  <Link>markt.html</Link>
+  <Beschreibung>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
+ et ea rebum.</Beschreibung>
+</Thema>
+<Thema Titel="Marktkirche">
+  <Link>mkirch.html</Link>
+  <Beschreibung>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
+ et ea rebum.</Beschreibung>
+</Thema>
+<Thema Titel="Thema4">
+  <Link>platzhalter.html</Link>
+  <Beschreibung>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
+ et ea rebum.</Beschreibung>
+</Thema>
+<Thema Titel="Thema5">
+  <Link>platzhalter.html</Link>
+  <Beschreibung>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
+ et ea rebum.</Beschreibung>
+</Thema>
+<Thema Titel="Thema6">
+  <Link>platzhalter.html</Link>
+  <Beschreibung>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores
+ et ea rebum.</Beschreibung>
+</Thema>
+    
+</Themenueb>

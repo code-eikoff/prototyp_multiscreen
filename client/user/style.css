@@ -568,7 +568,7 @@ Themenübersicht
 ====================================
 */
 .user_.themenueb #chose {
-  height: 60vh;
+  height: 90vh;
   text-align: center;
   font-size: 0.4em;
   font-weight: bold;
@@ -577,19 +577,45 @@ Themenübersicht
   padding-right: 10px;
 }
 
+.user_.themenueb #btn-1,
+.user_.themenueb #btn-2,
+.user_.themenueb #btn-3,
+.user_.themenueb #btn-4,
+.user_.themenueb #btn-5,
+.user_.themenueb #btn-6 {
+  margin: 10px 0px;
+}
+
 .user_.themenueb #btn-1 .box-arround {
-  background-color: #63b59c;
+  background-color: #c2b1b1;
 }
 
 .user_.themenueb #btn-2 .box-arround {
-  background-color: #927bd3;
+  background-color: #c1c2b1;
 }
 
 .user_.themenueb #btn-3 .box-arround {
-  background-color: #d36d70;
+  background-color: #b4c2b1;
 }
 
 .user_.themenueb #btn-4 .box-arround {
-  background-color: #f1b85b;
+  background-color: #b1c1c2;
+}
+
+.user_.themenueb #btn-5 .box-arround {
+  background-color: #b2b1c2;
+}
+
+.user_.themenueb #btn-6 .box-arround {
+  background-color: #bdb1c2;
+}
+
+.themen_details {
+  overflow: auto;
+}
+
+#details_img img {
+  width: 90vw;
+  margin-top: 20px;
 }
 /*# sourceMappingURL=style.css.map */
