@@ -156,22 +156,26 @@ host startseite
 }
 
 .host_ #header {
-  margin-top: 20vh;
-  height: 20vh;
+  margin-top: 1vh;
+  height: 29vh;
   text-align: center;
   font-size: 1.1em;
   line-height: 1.5em;
 }
 
 .host_ #chose {
-  height: 50vh;
+  height: 60vh;
   margin-bottom: 10vh;
   text-align: center;
   font-size: 1.1em;
   font-weight: bold;
-  margin-right: 4%;
-  margin-left: 4%;
+  margin-right: 4px;
+  margin-left: 4px;
   padding-right: 10px;
+}
+
+.host_ #chose > div {
+  padding: 25px;
 }
 
 .host_ #chose .box-arround {
@@ -197,7 +201,7 @@ host startseite
 }
 
 .host_ #ch-02 .box-arround {
-  background-color: #9595fe;
+  background-color: #959cfe;
 }
 
 .host_ #ch-03 .box-arround {
@@ -205,6 +209,10 @@ host startseite
 }
 
 .host_ #ch-04 .box-arround {
+  background-color: #ba69da;
+}
+
+.host_ #ch-05 .box-arround {
   background-color: #fffd6d;
 }
 
@@ -536,5 +544,21 @@ Themenübersicht
   margin: 10px 0px;
   font-size: 1.2rem;
   font-weight: 700;
+}
+
+.user_.galerie {
+  width: 100vw;
+  height: 100vh;
+  padding: 0px;
+  margin: 0px;
+}
+
+.user_.galerie #galerie_img {
+  -webkit-transition: .4s ease-in-out;
+  transition: .4s ease-in-out;
+  height: 100%;
+  width: 100%;
+  background-size: cover;
+  background-position: center center;
 }
 /*# sourceMappingURL=style.css.map */

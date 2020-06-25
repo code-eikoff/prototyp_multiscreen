@@ -165,15 +165,15 @@ user startseite
 .user_ #header {
 
     height: 30vh;
-    margin-bottom: 20px;
     text-align: center;
     font-size: 0.8em;
     line-height: 0.8em;
 }
 
 .user_ #header h1{
-    font-size: 1.3em;
+    font-size: 1.1em;
     font-weight: normal;
+    margin-top: 30px;
 }
 .user_ #header h2{
     font-size: 0.7em;
@@ -183,13 +183,15 @@ user startseite
     margin-bottom:30px;
 }
 .user_ #chose {
-    height: 45vh;
+    height: 70vh;
+
     text-align: center;
     font-size: 0.4em;
     font-weight: bold;
     margin-right: 18%;
     margin-left: 18%;
     padding-right: 10px;
+    margin-bottom:20vh
 }
 .user_ #chose .box-arround{
     position: relative;
@@ -228,6 +230,9 @@ user startseite
     background-color: #ff6d72;
 }
 .user_ #btn-4 .box-arround{
+    background-color: #ba69da;
+}
+.user_ #btn-5 .box-arround{
     background-color: #fffd6d;
 }
 
@@ -616,4 +621,105 @@ Themenübersicht
 #details_img img{
     width: 90vw;
     margin-top:20px;
+}
+
+
+
+.user_.galerie{
+
+
+    > .row{
+        background-color: #111;
+        color: #e0e0e0;
+        height: calc(100vh - 60px);
+        overflow: hidden;
+        opacity: 0;
+        transition: .4s ease-in-out;
+    }
+    
+#beschr_col{
+    #box_galerie{
+
+
+        h1{
+            margin:0px;
+        }
+        h2{
+            margin:30px 0px;
+            font-size:1rem;
+        }
+        p{
+            font-size:1rem;
+        }
+
+    }
+}
+    #left_col{
+        opacity: 0;
+        transition: .4s ease-in-out;
+        padding:0px;
+        #prev{
+            height: 30px;
+            width: 30px;
+            padding: 0px;
+            position: relative;
+        }
+        #prev::before{
+                position: absolute;
+                content: " ";
+                height: 6px;
+                width: 15px;
+                top: 15px;
+                left: 5px;
+                background-color: #e0e0e0;
+                transform: rotate(40deg);
+            }
+
+        #prev::after{
+                position: absolute;
+                content: " ";
+                height: 6px;
+                width: 15px;
+                top: 9px;
+                left: 5px;
+                background-color: #e0e0e0;
+                transform: rotate(-40deg);
+            }
+        
+    }
+    
+    #right_col{
+        opacity: 0;
+        transition: .4s ease-in-out;
+        padding:0px;
+
+        #next{
+            height: 30px;
+            width: 30px;
+            padding: 0px;
+            position: relative;
+        }
+        #next::before{
+                position: absolute;
+                content: " ";
+                height: 6px;
+                width: 15px;
+                top: 9px;
+                left: 5px;
+                background-color: #e0e0e0;
+                transform: rotate(40deg);
+            }
+
+        #next::after{
+                position: absolute;
+                content: " ";
+                height: 6px;
+                width: 15px;
+                top: 15px;
+                left: 5px;
+                background-color: #e0e0e0;
+                transform: rotate(-40deg);
+            }
+        
+    }
 }

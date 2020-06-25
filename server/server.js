@@ -1,27 +1,38 @@
 const io = require("socket.io")(3030);
 const fs = require("fs");
 const parseString = require("xml2js").parseString;
-// const xml2js = require("xml2js");
-// var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-
 
 const qrcode = require("./qrcode");
 
+// const link_host = "ms.eikoff.de";
 const link_host = "eikoff:5500";
 const link_user = link_host + "/client/user/";
 const link_host_base = "client/host/";
 
+const socket_host = io.of("/host");
+const socket_user = io.of("/user");
+
+let client_hosts = [];
+let client_users = [];
+let user_in_room = [];
+
+let quiz_sessions = [];
+let qs_geantwortet = [];
+const timer_quiz_frage = 3000; //ms
+const timer_next_qz = 15000 + timer_quiz_frage; //ms
+const anzahlFragen = 3;
+const punkte_max = timer_next_qz / 100;
 
 const options = [
   "home",
   "Detailansicht",
   "Lageplan",
   "Quiz",
-  "Themenübersicht"
+  "Themenübersicht",
+  "Galerie"
 ];
 
-const themenueb =
-{
+const themenueb = {
   Name: [],
   Beschreibung: [],
   Link: []
@@ -29,9 +40,7 @@ const themenueb =
 
 
 function ladeThemen() {
-
   fs.readFile("server/themen.xml", "utf-8", (err, data) => {
-
     if (err) {
       console.log(err);
     }
@@ -44,55 +53,20 @@ function ladeThemen() {
         themenueb.Name[i] = json.Themenueb.Thema[i].$.Titel;
         themenueb.Beschreibung[i] = json.Themenueb.Thema[i].Beschreibung.toString();
         themenueb.Link[i] = json.Themenueb.Thema[i].Link.toString();
-
       }
-
     });
   });
-
 }
-
-
-// setTimeout(
-//   () => {
-//     console.log(
-//       themenueb
-
-//     );
-//   }
-//   , 220);
-
-
-const socket_host = io.of("/host");
-const socket_user = io.of("/user");
-
-const timer_quiz_frage = 3000; //ms
-const timer_next_qz = 15000 + timer_quiz_frage; //ms
-const anzahlFragen = 3;
-const punkte_max = timer_next_qz / 100;
-
-let client_hosts = [];
-let client_users = [];
-
-// function getNumber() {
-//   fs.readFile("server/db.xml", "utf-8", (err, data) => {
-//     if (err) console.log(err);
-
-//     parseString(data, (err, result) => {
-//       if (err) console.log(err);
-//       var json = result;
-//       number = json.zahlen.tee[0].toString();
-//     });
-//   });
-// }
-
-let user_in_room = [];
-let quiz_sessions = [];
-let qs_geantwortet = [];
 
 /*
 
+===========================================
+===========================================
+
 -----  H O S T   C O N N E C T I O N  -----
+
+===========================================
+===========================================
 
 */
 
@@ -156,24 +130,32 @@ socket_host.on("connection", (socket) => {
 
 /*
 ===========================================
+===========================================
+
 -----  U S E R   C O N N E C T I O N  -----
+
+===========================================
 ===========================================
 
 User verbindet sich
 */
 
 socket_user.on("connection", (socket) => {
+
   client_users.push(socket);
   let room = "";
   let room_nr = 0;
-  let quiz_nr = 0;
-  let geantwortet = false;
   let punkte = 0;
-  let ready = true;
+  let geantwortet = false;
   let readyF = true;
+
+  let galerie = getGalerie();
 
   let timer_qz;
 
+  /*
+  Verbindung herstellen und in Room einloggen
+  */
   socket.on("user_connect", (r) => {
     room = r;
     while (room.charAt(0) === "#") {
@@ -193,6 +175,46 @@ socket_user.on("connection", (socket) => {
     socket_host.to(room).emit("verbunden");
   });
 
+  /*
+  Verbindung trennen
+  */
+  socket.on("disconnect", () => {
+    // console.log(socket_user.in(room).listenerCount.length)
+    client_users.pop(socket);
+
+    if (user_in_room[0]) {
+      for (i = 0; i < user_in_room.length; i++) {
+        if (user_in_room[i][0] === room) {
+          user_in_room[i][1] -= 1;
+          if (user_in_room[i][1] < 1) {
+            socket_host.to(room).emit("getrennt");
+
+            try {
+              if (qs_geantwortet[room_nr][1]) {
+                qs_geantwortet[room_nr][1] -= 1;
+              }
+              else {
+              }
+            } catch (err) {
+              //  console.error(err) //  hat noch ken quiz gespeilt
+            }
+
+            user_in_room.pop(user_in_room[i]);
+
+          }
+          // console.log(`user disconnect in "${room}"`);
+        }
+      }
+    }
+  });
+
+
+  // Wenn der Nutzer start drückt um Interaktion zu starten
+  socket.on("err", (err) => {
+    console.error(`ERROR: ${err}`);
+  });
+
+
   // Wenn der Nutzer start drückt um Interaktion zu starten
   socket.on("start", () => {
     socket_user.to(room).emit('load_options', options);
@@ -202,8 +224,6 @@ socket_user.on("connection", (socket) => {
     socket_host.to(room).emit("load_content", link_host_base + "index.html");
   });
 
-
-
   // wenn ein button der Themen-Auswahl im Hauptmenü geklickt wird
   socket.on("btn_click", (option, slide) => {
 
@@ -211,31 +231,36 @@ socket_user.on("connection", (socket) => {
       case options[0]: //"home"
         socket_user.to(room).emit('load_content', `${options[0]}.html`, options[0]);
         socket_host.to(room).emit("load_content", `${link_host_base}index.html`, options[0]);
-
         break;
-      case options[1]: //"kaiserpf"
 
+      case options[1]: //"kaiserpf"
         if (slide) {
           socket_user.to(room).emit('load_content', `${options[1]}.html`, options[1], slide);
           socket_host.to(room).emit("load_content", `${link_host_base}${options[1]}.html`, options[1], slide);
-
         } else {
           socket_user.to(room).emit('load_content', `${options[1]}.html`, options[1]);
           socket_host.to(room).emit("load_content", `${link_host_base}${options[1]}.html`, options[1]);
-
         }
         break;
+
       case options[2]: //"lageplan"
         socket_user.to(room).emit('load_content', `${options[2]}.html`, options[2]);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[2]}.html`, options[2]);
         break;
+
       case options[3]: //"quiz"
         socket_user.to(room).emit('load_content', `${options[3]}.html`, options[3]);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[3]}.html`, options[3]);
         break;
+
       case options[4]://themenübersicht
         socket_user.to(room).emit('load_content', `${options[4]}.html`, options[4], themenueb);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[4]}.html`, options[4], themenueb);
+        break;
+
+      case options[5]://galerie
+        socket_user.to(room).emit('load_content', `${options[5]}.html`, options[5], galerie);
+        socket_host.to(room).emit("load_content", `${link_host_base}${options[5]}.html`, options[5], galerie);
         break;
 
       default:
@@ -246,23 +271,48 @@ socket_user.on("connection", (socket) => {
 
 
 
+
+  /*
+  
+  ==================================================
+  ==================================================
+  
+      R E G I S T E R K A R T E N   /   Tabs
+  
+  ==================================================
+  ==================================================
+  
+  */
+
   socket.on("slideChange", (slideNr) => {
     socket_user.to(room).emit('change_Slide', slideNr);
     socket_host.to(room).emit("change_Slide", slideNr);
   });
 
-  socket.on("details_Galerie", (nr, slide) => {
+  socket.on("details_Tabs", (nr, slide) => {
     socket_user.to(room).emit('load_content', `details/${options[1]}_${nr}.html`, options[1] + '_details', slide);
     socket_host.to(room).emit('load_content', `${link_host_base}details/${options[1]}_${nr}.html`, options[1] + '_details', slide);
   });
-
-
-
 
   socket.on("scrollToItem", (i) => {
     socket_host.to(room).emit('scrollToItem', i);
   });
 
+
+
+
+
+  /*
+  
+  ==================================================
+  ==================================================
+  
+      L A G E P L A N
+  
+  ==================================================
+  ==================================================
+  
+  */
   socket.on("mapControl", (cmd) => {
     switch (cmd) {
       case "up":
@@ -288,6 +338,30 @@ socket_user.on("connection", (socket) => {
     }
   });
 
+
+
+
+  /*
+  
+  ==================================================
+  ==================================================
+  
+      Q U I Z
+  
+  ==================================================
+  ==================================================
+  
+  */
+
+  function starteTimerStoppFrage(nr, qs) {
+    timer_qz = setTimeout(() => {
+      neueFage(nr, qs);
+    }, timer_next_qz);
+  }
+
+  function stopTimerQz() {
+    clearTimeout(timer_qz);
+  }
 
   socket.on("neueQuizSession", () => {
     console.log("neueQuizSession");//ooooooooo
@@ -362,7 +436,6 @@ socket_user.on("connection", (socket) => {
 
   });
 
-
   socket.on("antwort", (antw, t, nr, qs) => {
     let ga = 0;
     let ges = 1;
@@ -416,24 +489,25 @@ socket_user.on("connection", (socket) => {
 
   });
 
-  function starteTimerStoppFrage(nr, qs) {
-    timer_qz = setTimeout(() => {
-      neueFage(nr, qs);
-    }, timer_next_qz);
-  }
-
-  function stopTimerQz() {
-    clearTimeout(timer_qz);
-  }
-
   socket.on("ladeStatistik", () => {
     socket.emit("zeigeStatistik", Math.round((punkte / 10)));
   });
 
 
 
-  // THEMENÜBERSICHT
 
+
+  /*
+
+==================================================
+==================================================
+
+    T H E M E N Ü B E R S I C H T
+
+==================================================
+==================================================
+
+  */
   socket.on("themaÖffnen", (i) => {
     socket_user.to(room).emit('load_content', `details/${themenueb.Link[i]}`, `${options[4]}_details`);
   });
@@ -442,35 +516,24 @@ socket_user.on("connection", (socket) => {
 
 
 
-  socket.on("disconnect", () => {
-    // console.log(socket_user.in(room).listenerCount.length)
-    client_users.pop(socket);
+  /*  
 
-    if (user_in_room[0]) {
-      for (i = 0; i < user_in_room.length; i++) {
-        if (user_in_room[i][0] === room) {
-          user_in_room[i][1] -= 1;
-          if (user_in_room[i][1] < 1) {
-            socket_host.to(room).emit("getrennt");
+==================================================
+==================================================
 
-            try {
-              if (qs_geantwortet[room_nr][1]) {
-                qs_geantwortet[room_nr][1] -= 1;
-              }
-              else {
-              }
-            } catch (err) {
-              //  console.error(err) //  hat noch ken quiz gespeilt
-            }
+    G A L E R I E
 
-            user_in_room.pop(user_in_room[i]);
+==================================================
+==================================================
 
-          }
-          // console.log(`user disconnect in "${room}"`);
-        }
-      }
-    }
+  */
+
+  socket.on("next_Pic", (n) => {
+
+    socket_user.to(room).emit('next_Pic', n);
+    socket_host.to(room).emit('next_Pic', n);
   });
+
 
 
 
@@ -478,6 +541,19 @@ socket_user.on("connection", (socket) => {
 
 
 
+
+
+/*
+
+==================================================
+==================================================
+
+ -------------  Weitere Funktionen  -------------
+
+==================================================
+==================================================
+
+*/
 
 /*
 erstelle ein QRCode-Link als Bild
@@ -491,7 +567,9 @@ function getQRcode(link) {
   return qr.createImgTag("10", "0", "qrcode");
 }
 
-
+/*
+erstelle eine zufällige id
+*/
 function makeid(length) {
   var result = "";
   var characters = "123456789abcdefghikmpqrstuwxyz";
@@ -524,6 +602,7 @@ function neueQuizSession(room, fragen_anzahl) {
 
 }
 
+
 function neueFage(nr, qs) {
   // let qs = quiz_sessions[nr];
   qs.FrageNr++
@@ -542,7 +621,6 @@ function neueFage(nr, qs) {
   // }
 
 }
-
 
 
 function getFrageAntwort(n) {
@@ -581,64 +659,13 @@ function getFrageAntwort(n) {
   } catch (err) {
     console.error(err);
   }
-
   return fa;
-
 }
 
 
-// function getHTMLText(link) {
-//   fs.readFile(link, "utf-8", (err, data) => {
-//     if (err) console.log(err);
-//     console.log(data);
-//     return data;
-//   });
-// }
-
-// io.on("connection", (socket) => {
-//   if (io.engine.clientsCount <= 1) socket.emit("qrlink", link_click);
-
-//   socket.on("request", (url_s) => {
-//     console.log("url: " + url_s);
-//     socket.broadcast.emit("show_number", number);
-//     socket.emit("number", number);
-//   });
-
-//   socket.on("addOne", () => {
-//     number++;
-//     socket.broadcast.emit("number", number);
-//     socket.emit("number", number);
-//   });
-
-//   socket.on("disconnect", () => {
-//     console.log(io.engine.clientsCount);
-//     if (io.engine.clientsCount <= 1) {
-//       saveNumber(number);
-//       socket.broadcast.emit("qrlink", link_click);
-//       console.log("x");
-//     }
-//   });
-// });
-
-// function saveNumber(n) {
-//   let fileLoc = "server/db.xml";
-
-//   fs.readFile(fileLoc, "utf-8", (err, data) => {
-//     if (err) console.log(err);
-
-//     parseString(data, (err, result) => {
-//       if (err) console.log(err);
-//       var json = result;
-//       json.zahlen.tee[0] = n;
-//       var builder = new xml2js.Builder();
-//       var xml = builder.buildObject(json);
-
-//       fs.writeFile(fileLoc, xml, (err, data) => {
-//         if (err) console.log(err);
-//       });
-//     });
-//   });
-// }
-
+function getGalerie() {
+  let rawdata = fs.readFileSync('server/galerie.json');
+  return JSON.parse(rawdata);
+}
 
 

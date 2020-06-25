@@ -1,5 +1,6 @@
 
 const button = document.getElementById("los");
+const xwiper = new Xwiper("#content", 8);
 
 let currentSlideIndex = 0;
 let currentMenuName = 'home';
@@ -49,8 +50,6 @@ socket.on("load_content", (html_link, name, data) => {
   importContent(html_link);
   currentMenuName = name;
   initContent(name, data);
-
-
 });
 
 
@@ -84,38 +83,52 @@ function initContent(name, data) {
       setTimeout(initHome, 300);
       break;
 
+    //Registerkarten
     case options[1]:
       backButtonLoc = options[0];
       setTimeout(initOpt01, 300);
       break;
 
+    //Registerkarten Details
     case (options[1] + '_details'):
       currentSlideIndex = data;
       backButtonLoc = options[1];
       setTimeout(initOpt01, 300);
       break;
 
+    // Lageplan
     case options[2]:
       backButtonLoc = options[0];
       setTimeout(initMapController, 300);
       break;
 
-    case options[3]: //Quiz
+    //Quiz
+    case options[3]:
       backButtonLoc = options[0];
       setTimeout(initQuiz, 300);
       break;
 
-    case options[4]: //Themenübersicht
+    //Themenübersicht
+    case options[4]:
       backButtonLoc = options[0];
       setTimeout(() => {
         initThemenueb(data)
       }, 300);
       break;
 
-    case (`${options[4]}_details`): //Themenübersicht UnterMenü
+    //Themenübersicht UnterMenü
+    case (`${options[4]}_details`):
       backButtonLoc = `${options[4]}_d`;
       setTimeout(() => {
         initThema();
+      }, 300);
+      break;
+
+    //Galerie
+    case options[5]:
+      backButtonLoc = options[0];
+      setTimeout(() => {
+        initGalerie(data);
       }, 300);
       break;
 
@@ -133,58 +146,14 @@ function initHome() {
 
   currentMenuName = options[0];
 
-  btn_opt_1 = document.getElementById("btn-1");
-  btn_opt_2 = document.getElementById("btn-2");
-  btn_opt_3 = document.getElementById("btn-3");
-  btn_opt_4 = document.getElementById("btn-4");
-
-  //Kaiserpfalr Galerie
-  if (btn_opt_1) {
-    let ueb = btn_opt_1.getElementsByClassName("text_ueb");
-    ueb[0].innerHTML = options[1];
-    ueb[0].style.opacity = 1;
-    btn_opt_1.addEventListener("click", (e) => {
-      e.stopImmediatePropagation();
-      btn_opt_1.classList.add("btn-active");
-      btnClick(options[1]);
-    });
-  }
-
-  //Lageplan
-  if (btn_opt_2) {
-    let ueb = btn_opt_2.getElementsByClassName("text_ueb");
-    ueb[0].innerHTML = options[2];
-    ueb[0].style.opacity = 1;
-    btn_opt_2.addEventListener("click", (e) => {
-      e.stopImmediatePropagation();
-      btn_opt_2.classList.add("btn-active");
-      btnClick(options[2]);
-    });
-  }
-
-  //Quiz
-  if (btn_opt_3) {
-    let ueb = btn_opt_3.getElementsByClassName("text_ueb");
-    ueb[0].innerHTML = options[3];
-    ueb[0].style.opacity = 1;
-    btn_opt_3.addEventListener("click", (e) => {
-      e.stopImmediatePropagation();
-      btn_opt_3.classList.add("btn-active");
-      btnClick(options[3]);
-
-    });
-  }
-
-  //Themenübersicht
-  if (btn_opt_4) {
-    let ueb = btn_opt_4.getElementsByClassName("text_ueb");
-    ueb[0].innerHTML = options[4];
-    ueb[0].style.opacity = 1;
-    btn_opt_4.addEventListener("click", (e) => {
-      e.stopImmediatePropagation();
-      btn_opt_4.classList.add("btn-active");
-      btnClick(options[4]);
-
+  for (let i = 1; i <= 5; i++) {
+    btn = document.getElementById(`btn-${i}`);
+    let txt = btn.getElementsByClassName("text_ueb")[0];
+    txt.innerHTML = options[i];
+    txt.style.opacity = 1;
+    btn.addEventListener("click", () => {
+      btn.classList.add("btn-active");
+      btnClick(options[i]);
     });
   }
 
@@ -334,7 +303,7 @@ function btnClick(option, slide) {
 }
 
 function itemGaClick(a, b) {
-  socket.emit('details_Galerie', a, b);
+  socket.emit('details_Tabs', a, b);
 }
 
 
@@ -355,17 +324,20 @@ function initBack() {
     bc.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       currentSlideIndex = 0;
-      // btnClick(options[0], 0);
+
       switch (backButtonLoc) {
         case 'home':
           btnClick(options[0], '0');
           break;
+
         case options[1]:
           btnClick(options[1], '0');
           break;
+
         case `${options[4]}_d`:
           btnClick(options[4], '0');
           break;
+
         default:
           btnClick(options[0], '0');
 
@@ -374,8 +346,6 @@ function initBack() {
   }
 
 }
-
-
 
 function prevSlide() {
   switch (currentSlideIndex) {
@@ -388,7 +358,6 @@ function prevSlide() {
   socket.emit("slideChange", currentSlideIndex);
 }
 
-
 function nextSlide() {
   switch (currentSlideIndex) {
     case tabsControls.length - 1:
@@ -399,9 +368,6 @@ function nextSlide() {
   }
   socket.emit("slideChange", currentSlideIndex);
 }
-
-
-
 
 function setTabbarOffset() {
 
@@ -431,9 +397,6 @@ function setTabbarOffset() {
 
 
 
-
-
-
 /*
 =============================
 
@@ -441,7 +404,6 @@ Quiz
 
 ================================
 */
-
 
 function initQuiz() {
 
@@ -580,14 +542,10 @@ function initQuiz() {
     document.getElementById("content_html").innerHTML = html;
   });
 
-  socket.on("refresh", () => {
-    location.reload();
-  });
+
 
 
 }//initQuiz
-
-
 
 
 /*
@@ -597,10 +555,6 @@ function initQuiz() {
 
 ================================
 */
-
-
-
-
 
 function initThemenueb(themen) {
 
@@ -636,7 +590,121 @@ function initThema() {
 
 
 
+/*
+================================
 
+ G A L E R I E
+
+================================
+*/
+
+
+
+
+
+function initGalerie(galerie) {
+
+  initMenu();
+
+  let nummer = 0;
+  let e = document.getElementsByClassName(`user_`)[0];
+  let f = e.getElementsByClassName('row')[0];
+  f.style.opacity = 1;
+
+  socket.on("next_Pic", (nummer) => {
+    ladeInhalt(nummer);
+  });
+
+  function ladeInhalt(nummer) {
+    try {
+      let box = document.getElementById(`box_galerie`);
+      let h1 = box.getElementsByTagName('h1')[0];
+      let h2 = box.getElementsByTagName('h2')[0];
+      let p = box.getElementsByTagName('p')[0];
+
+      h1.innerHTML = galerie.bild[nummer].titel;
+      h2.innerHTML = galerie.bild[nummer].author;
+      p.innerHTML = galerie.bild[nummer].beschreibung;
+
+      box.style.opacity = 1;
+      document.getElementById(`left_col`).style.opacity = 1;
+      document.getElementById(`right_col`).style.opacity = 1;
+
+    } catch (error) {
+      console.log(error);
+      socket.emit('err', error);
+    }
+  }
+
+  function initBtn() {
+    try {
+      console.log(galerie.bild.length);
+
+      let prev = document.getElementById(`left_col`);
+      let next = document.getElementById(`right_col`);
+
+      prev.addEventListener("click", () => prevPic());
+      next.addEventListener("click", () => nextPic());
+
+    } catch (error) {
+      console.log(error);
+      socket.emit('err', error);
+    }
+  }
+
+  ladeInhalt(nummer);
+  initBtn();
+
+
+  function prevPic() {
+
+    if (nummer >= 1) nummer--;
+    else nummer = galerie.bild.length - 1;
+
+
+    let prev = document.getElementById(`left_col`);
+    let next = document.getElementById(`right_col`);
+    prev.style.opacity = 0;
+    next.style.opacity = 0;
+    document.getElementById(`box_galerie`).style.opacity = 0;
+
+    setTimeout(() => {
+      socket.emit("next_Pic", nummer);
+    }, 400);
+
+  }
+
+  function nextPic() {
+
+    if (nummer < galerie.bild.length - 1) nummer++;
+    else nummer = 0;
+    let prev = document.getElementById(`left_col`);
+    let next = document.getElementById(`right_col`);
+    prev.style.opacity = 0;
+    next.style.opacity = 0;
+    document.getElementById(`box_galerie`).style.opacity = 0;
+
+    setTimeout(() => {
+      socket.emit("next_Pic", nummer);
+    }, 400);
+
+  }
+
+  xwiper.onSwipeLeft(() => nextPic());
+  xwiper.onSwipeRight(() => prevPic());
+
+}
+
+
+
+
+
+
+
+
+socket.on("refresh", () => {
+  location.reload();
+});
 
 
 /*
@@ -648,7 +716,6 @@ function initThema() {
 */
 
 
-const xwiper = new Xwiper("#content", 8);
 
 xwiper.onSwipeLeft(() => {
   socket.emit('say', 'Swiped left')

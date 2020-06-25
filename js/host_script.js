@@ -104,7 +104,10 @@ function initContent(name, data) {
       setTimeout(() => {
         initThemenueb(data);
       }, 40);
+      break;
 
+    case options[5]: //Galerie
+      setTimeout(() => initGalerie(data), 40);
       break;
 
 
@@ -114,6 +117,7 @@ function initContent(name, data) {
   }
 }
 
+// R e g i s t e r k a r t e n
 function initOpt01() {
 
   let elem = document.getElementById("tabs_host");
@@ -151,7 +155,6 @@ function initOpt01() {
   tabsControls = elem.getElementsByClassName("tabs__controls");
 
   for (let i = 0; i < tabsControls.length; i++) {
-
     tabsControls[i].addEventListener("click", (e) => {
       socket.emit('slideChange', i);
     });
@@ -159,6 +162,7 @@ function initOpt01() {
 
 }
 
+// L a g e p l a n
 function initOptMap() {
   let mymap = L.map('mapid').setView([51.9050, 10.4281], 17);
 
@@ -233,7 +237,6 @@ function initOptMap() {
 
 }
 
-
 function setTabbarOffset() {
 
   let e = document.getElementsByClassName("tabs__line");
@@ -242,9 +245,9 @@ function setTabbarOffset() {
 
 }
 
-
-
+// Q U I Z
 function initQuiz() {
+
   neueFrage = true;
 
   //zeigt eine neue Frage an
@@ -286,10 +289,6 @@ function initQuiz() {
 
   });
 
-
-
-
-
   socket.on("zeigeFrageAntwort", (fa, correct) => {
     console.log(neueFrage + " " + fa)
     if (neueFrage) {
@@ -326,6 +325,7 @@ function initQuiz() {
 
 }
 
+// T h e m e n ü b e r s i c h t
 function initThemenueb(themen) {
 
   setTimeout(() => {
@@ -342,6 +342,30 @@ function initThemenueb(themen) {
     }
 
   }, 300);
+}
+
+// G a l e r i e
+function initGalerie(galerie) {
+
+  let nummer = 0;
+
+  socket.on("next_Pic", (nummer) => {
+    ladeInhalt(nummer);
+  });
+
+
+  function ladeInhalt(nummer) {
+    try {
+      let pic = document.getElementById(`galerie_img`);
+      pic.style.backgroundImage = `url('${galerie.bild[nummer].bild_link}')`;
+    } catch (error) {
+      socket.emit('err', error);
+    }
+  }
+
+  ladeInhalt(nummer);
+
+
 }
 
 
