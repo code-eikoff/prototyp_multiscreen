@@ -18,7 +18,7 @@ h1, h2, h3, h4 {
     font-family: 'Inter', sans-serif;
     font-weight: 900;
     font-size: 30px;
-    margin-top: 80px;
+    margin-top: 60px;
 }
 
 .hidden {
@@ -148,7 +148,7 @@ user startseite
 -----------------------------
 */
 
-.user_home {
+.user_ {
     height: 100vh;
     position: absolute;
     top: 0px;
@@ -157,12 +157,12 @@ user startseite
     left: 0px;
 }
 
-.user_home > div {
+.user_ > div {
     // height: 100vh;
     margin: 0px;
 }
 
-.user_home #header {
+.user_ #header {
 
     height: 30vh;
     margin-bottom: 20px;
@@ -171,21 +171,19 @@ user startseite
     line-height: 0.8em;
 }
 
-.user_home #header h1{
+.user_ #header h1{
     font-size: 1.3em;
     font-weight: normal;
 }
-.user_home #header h2{
+.user_ #header h2{
     font-size: 0.7em;
     line-height: 1.5em;
     font-weight: normal;
     margin-top: 30px;
     margin-bottom:30px;
 }
-.user_home #chose {
+.user_ #chose {
     height: 45vh;
-    /* margin-top: 5vh;
-    margin-bottom: 5vh; */
     text-align: center;
     font-size: 0.4em;
     font-weight: bold;
@@ -193,19 +191,19 @@ user startseite
     margin-left: 18%;
     padding-right: 10px;
 }
-.user_home #chose .box-arround{
+.user_ #chose .box-arround{
     position: relative;
     height: 9vh;
     width: 100%;
     /* transform: translateY(0px); */
 }
 
-.user_home #chose .box-arround .row{
+.user_ #chose .box-arround .row{
     height: 100%;
     z-index: 5;
   
 }
-.user_home #chose .box-arround::after{
+.user_ #chose .box-arround::after{
     content:"";
     position: absolute;
     z-index: -1;
@@ -215,44 +213,44 @@ user startseite
     width: calc(100% - 9px);
     border: #000000 2px solid;
 }
-.user_home #chose .btn-active .box-arround::after{
+.user_ #chose .btn-active .box-arround::after{
     background-color: #000000;
 }
 
 
-.user_home #btn-1 .box-arround{
+.user_ #btn-1 .box-arround{
     background-color: #95b563;
 }
-.user_home #btn-2 .box-arround{
+.user_ #btn-2 .box-arround{
     background-color: #9595fe;
 }
-.user_home #btn-3 .box-arround{
+.user_ #btn-3 .box-arround{
     background-color: #ff6d72;
 }
-.user_home #btn-4 .box-arround{
+.user_ #btn-4 .box-arround{
     background-color: #fffd6d;
 }
 
-.user_home #chose .text_ueb{
+.user_ #chose .text_ueb{
     opacity: 0;
     transition: .4s ease-in-out;
 }
 
 
-.user_home #btn-1 .text_ueb{
+.user_ #btn-1 .text_ueb{
     transition-delay: 0s;
 }
-.user_home #btn-2 .text_ueb{
+.user_ #btn-2 .text_ueb{
     transition-delay: 0.1s;
 }
-.user_home #btn-3 .text_ueb{
+.user_ #btn-3 .text_ueb{
     transition-delay: 0.2s;
 }
-.user_home #btn-4 .text_ueb{
+.user_ #btn-4 .text_ueb{
     transition-delay: 0.3s;
 }
 
- .menu_arround{
+.menu_arround{
     position: fixed;
     width: 100%;
     bottom: 0px;
@@ -271,7 +269,8 @@ user startseite
     justify-content: center; 
     
 }
- menu{
+
+menu{
     // width: 150px;
     margin-bottom: 16px;
     width: auto;
@@ -279,7 +278,8 @@ user startseite
     padding: 0px;
     position: relative;
 }
- menu::before{
+
+menu::before{
     position: absolute;
     content: " ";
     height: 7px;
@@ -288,7 +288,8 @@ user startseite
     left: 0px;
     background-color: #242424;
 }
- menu::after{
+
+menu::after{
     position: absolute;
     content: " ";
     height: 7px;
@@ -306,7 +307,8 @@ user startseite
     left: 40px;
     position: absolute;
 }
- #back::before{
+
+#back::before{
     position: absolute;
     content: " ";
     height: 6px;
@@ -316,7 +318,8 @@ user startseite
     background-color: #242424;
     transform: rotate(40deg);
 }
- #back::after{
+
+#back::after{
     position: absolute;
     content: " ";
     height: 6px;
@@ -339,7 +342,7 @@ user galerie
 
 
 
-.user_home .tabs{
+.user_ .tabs{
     margin-bottom: 70px;
 }
 .tabs__controls {
@@ -552,4 +555,44 @@ Quiz Content
     height: 100%;
     z-index: 5;
     font-size: 2rem;
+}
+
+
+
+
+/*
+====================================
+
+Themenübersicht
+
+====================================
+*/
+
+
+
+.user_.themenueb {
+    #chose {
+        height: 60vh;
+        text-align: center;
+        font-size: 0.4em;
+        font-weight: bold;
+        margin-right: 10%;
+        margin-left: 10%;
+        padding-right: 10px;
+    }
+    #btn-1 .box-arround{
+        background-color: #63b59c;
+    }
+    #btn-2 .box-arround{
+        background-color: #927bd3;
+    }
+    #btn-3 .box-arround{
+        background-color: #d36d70;
+    }
+    #btn-4 .box-arround{
+        background-color: #f1b85b;
+    }
+
+
+
 }

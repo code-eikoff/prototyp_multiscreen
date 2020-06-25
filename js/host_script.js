@@ -244,10 +244,14 @@ function setTabbarOffset() {
 
 function initQuiz() {
   neueFrage = true;
+
+  //zeigt eine neue Frage an
   socket.on("zeigeFrage", (frage, timer, nr, qs) => {
     console.error(qs);
 
     if (!neueFrage) importContent("/client/host/Quiz.html");
+
+    //nach einem kleinen Puffer, bis der Inhalt geladen wurde
     setTimeout(() => {
 
       let ready = true;
@@ -256,6 +260,7 @@ function initQuiz() {
 
       f.innerHTML = String(seconds);
 
+      //countdown bevor die frage angezeigt wird
       function tick() {
         seconds--;
         f.innerHTML = String(seconds);
@@ -266,6 +271,7 @@ function initQuiz() {
           f.innerHTML = frage;
           if (ready) {
             ready = false;
+            //übermittle, dass nun die Antworten angezeigt werden können
             socket.emit("set_user_antworten", nr, qs);
             neueFrage = true;
           }
@@ -322,4 +328,9 @@ socket.on("zeigeStatistik", (stats) => {
 
 
 
+});
+
+
+socket.on("refresh", () => {
+  location.reload();
 });

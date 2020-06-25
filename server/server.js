@@ -17,10 +17,10 @@ const options = ["home", "Detailansicht", "Lageplan", "Quiz", "Themenübersicht"
 const socket_host = io.of("/host");
 const socket_user = io.of("/user");
 
-const timer_quiz_frage = 2000; //ms
-const timer_next_qz = 15000; //ms
-const anzahlFragen = 2;
-const punkte_max = 300;
+const timer_quiz_frage = 3000; //ms
+const timer_next_qz = 15000 + timer_quiz_frage; //ms
+const anzahlFragen = 3;
+const punkte_max = timer_next_qz / 100;
 
 let client_hosts = [];
 let client_users = [];
@@ -122,6 +122,7 @@ socket_user.on("connection", (socket) => {
   let ready = true;
   let readyF = true;
 
+  let timer_qz;
 
   socket.on("user_connect", (r) => {
     room = r;
@@ -136,9 +137,6 @@ socket_user.on("connection", (socket) => {
         if (user_in_room[i][0] === room) {
           user_in_room[i][1]++;
           room_nr = i;
-          console.log(
-            `new user in "${user_in_room[i][0]}": ${user_in_room[i][1]}`
-          );
         }
       }
     }
@@ -255,14 +253,19 @@ socket_user.on("connection", (socket) => {
   socket.on("starteQuizSession", (nr, qs) => {
 
     console.log("starteQuizSession");//ooooooooo
+    try {
+      // let qs = quiz_sessions[nr];
 
-    // let qs = quiz_sessions[nr];
+      qs_geantwortet.push([0, user_in_room[nr][1]]);
+      console.log(user_in_room[nr][1]);
 
-    qs_geantwortet.push([0, user_in_room[nr][1]]);
-    console.log(user_in_room[nr][1]);
-
-    socket_user.to(qs.Room).emit('platzhalter');
-    socket_host.to(qs.Room).emit('zeigeFrage', qs.Fragen[qs.FrageNr].frage, timer_quiz_frage, nr, qs);
+      socket_user.to(qs.Room).emit('platzhalter');
+      socket_host.to(qs.Room).emit('zeigeFrage', qs.Fragen[qs.FrageNr].frage, timer_quiz_frage, nr, qs);
+      starteTimerStoppFrage(nr, qs);
+    } catch (error) {
+      socket_user.to(qs.Room).emit("refresh");
+      socket_host.to(qs.Room).emit("refresh");
+    }
 
 
   });
@@ -282,6 +285,7 @@ socket_user.on("connection", (socket) => {
           if (qs.FrageNr + 1 == anzahlFragen) {
             setTimeout(() => {
               console.log("hier time");
+              stopTimerQz();
               socket_user.to(qs.Room).emit("ladeStatistik");
               socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
             }, timer_next_qz);
@@ -310,7 +314,6 @@ socket_user.on("connection", (socket) => {
 
 
   socket.on("antwort", (antw, t, nr, qs) => {
-    console.log("Punkte: " + socket.punkte);
     let ga = 0;
     let ges = 1;
     // let qs = quiz_sessions[nr];
@@ -341,6 +344,7 @@ socket_user.on("connection", (socket) => {
 
             } else {
               neueFage(nr, qs);
+              stopTimerQz();
               geantwortet = false;
             }
           }
@@ -369,7 +373,7 @@ socket_user.on("connection", (socket) => {
   // });
 
   socket.on("ladeStatistik", () => {
-    socket.emit("zeigeStatistik", punkte);
+    socket.emit("zeigeStatistik", Math.round((punkte / 10)));
   });
 
 
@@ -387,15 +391,14 @@ socket_user.on("connection", (socket) => {
             try {
               if (qs_geantwortet[room_nr][1]) {
                 qs_geantwortet[room_nr][1] -= 1;
-                user_in_room.pop(user_in_room[i]);
               }
               else {
-                user_in_room.pop(user_in_room[i]);
               }
             } catch (err) {
-              console.error(err)
+              //  console.error(err) //  hat noch ken quiz gespeilt
             }
 
+            user_in_room.pop(user_in_room[i]);
 
           }
           // console.log(`user disconnect in "${room}"`);
@@ -404,7 +407,15 @@ socket_user.on("connection", (socket) => {
     }
   });
 
+  function starteTimerStoppFrage(nr, qs) {
+    timer_qz = setTimeout(() => {
+      neueFage(nr, qs);
+    }, timer_next_qz);
+  }
 
+  function stopTimerQz() {
+    clearTimeout(timer_qz);
+  }
 
 });
 
@@ -435,17 +446,6 @@ function makeid(length) {
   return result;
 }
 
-function makeid2(length) {
-  var result = "";
-  var characters = "abc";
-  var charactersLength = characters.length;
-  for (var i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-
-  return result;
-}
-
 
 function neueQuizSession(room, fragen_anzahl) {
 
@@ -465,12 +465,6 @@ function neueQuizSession(room, fragen_anzahl) {
     socket_user.to(room).emit('QuizSessionBereit', quiz_session_number, quiz_session);
   }, 500);
 
-}
-
-function starteTimerStoppFrage(nr, qs) {
-  setTimeout(() => {
-    neueFage(nr, qs);
-  }, timer_next_qz);
 }
 
 function neueFage(nr, qs) {

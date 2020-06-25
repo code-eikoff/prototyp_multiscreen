@@ -116,7 +116,7 @@ host startseite
 -----------------------------
 */
 
-.host_home {
+.host_ {
   height: 100vh;
   position: absolute;
   top: 0px;
@@ -125,12 +125,12 @@ host startseite
   left: 0px;
 }
 
-.host_home > div {
+.host_ > div {
   height: 100vh;
   margin: 0px;
 }
 
-.host_home #header {
+.host_ #header {
   margin-top:20vh;
   height: 20vh;
   text-align: center;
@@ -139,7 +139,7 @@ host startseite
 }
 
 
-.host_home #chose {
+.host_ #chose {
   height: 50vh;
   margin-bottom: 10vh;
   text-align: center;
@@ -149,12 +149,12 @@ host startseite
   margin-left: 10%;
   padding-right: 10px;
 }
-.host_home #chose .box-arround{
+.host_ #chose .box-arround{
   position: relative;
   height: 200px;
   width: 100%;
 }
-.host_home #chose .box-arround::after{
+.host_ #chose .box-arround::after{
   content:" ";
   position: absolute;
   z-index: -1;
@@ -166,17 +166,17 @@ host startseite
   border: #000000 3px solid;
 }
 
-.host_home #ch-01 .box-arround{
+.host_ #ch-01 .box-arround{
   background-color: #95b563;
 }
-.host_home #ch-02 .box-arround{
+.host_ #ch-02 .box-arround{
   background-color: #9595fe;
 }
-.host_home #ch-03 .box-arround{
+.host_ #ch-03 .box-arround{
   background-color: #ff6d72;
 }
 
-.host_home #chose .box-arround .row{
+.host_ #chose .box-arround .row{
   height: 100%;
   /* width: 80%; */
   

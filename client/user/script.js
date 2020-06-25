@@ -105,6 +105,11 @@ function initContent(name, slide) {
       setTimeout(initQuiz, 300);
       break;
 
+    case options[3]: //Themenübersicht
+      backButtonLoc = options[0];
+      setTimeout(initThemenueb, 300);
+      break;
+
     // wenn nichts definiert wird --> zurück zum hauptmenü
     default:
       setTimeout(initHome, 300);
@@ -427,6 +432,7 @@ Quiz
 
 
 function initQuiz() {
+
   let qz_nr = 0;
   let ready = true;
   initMenu();
@@ -452,7 +458,7 @@ function initQuiz() {
 
   socket.on("neueFrageBereit", (nr, qs) => {
     ready = true;
-    importContent('quiz.html');
+    importContent('Quiz.html');
     setTimeout(() => {
       let losBtn = document.getElementById("los");
 
@@ -562,6 +568,40 @@ function initQuiz() {
     document.getElementById("content_html").innerHTML = html;
   });
 
+  socket.on("refresh", () => {
+    location.reload();
+  });
+
+
+}//initQuiz
+
+
+
+
+/*
+================================
+
+ T h e m e n ü b e r s i c h t 
+
+================================
+*/
+
+
+
+
+
+function initThemenueb() {
+
+
+  initMenu();
+
+  // socket.emit("neueQuizSession");
+
+  // socket.on("", () => {
+
+  // });
+
+
 
 }
 
@@ -573,19 +613,13 @@ function initQuiz() {
 
 
 
-
-
-
-
-
-
-
-
-/*===================
+/*
+==================================
  
-Wischbewegungen erkennen
+    Wischbewegungen erkennen
  
-=====================*/
+==================================
+*/
 
 
 const xwiper = new Xwiper("#content", 8);
