@@ -17,8 +17,10 @@ const options = ["home", "Detailansicht", "Lageplan", "Quiz", "Themenübersicht"
 const socket_host = io.of("/host");
 const socket_user = io.of("/user");
 
-const timer_quiz_frage = 20;
+const timer_quiz_frage = 2000; //ms
+const timer_next_qz = 15000; //ms
 const anzahlFragen = 2;
+const punkte_max = 300;
 
 let client_hosts = [];
 let client_users = [];
@@ -50,7 +52,7 @@ socket_host.on("connection", (socket) => {
   // let room = 'room'+client_hosts.length;
 
   let room = makeid(3);
-  room = "test";
+  room = "b";
   user_in_room.push([room, 0]);
   socket.join(room);
 
@@ -72,12 +74,12 @@ socket_host.on("connection", (socket) => {
     socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + '.html'); //schicke qr-code img
   });
 
-  socket.on("set_user_antworten", (nr) => {
+  socket.on("set_user_antworten", (nr, qs) => {
     setTimeout(() => {
-      let qs = quiz_sessions[nr];
+      // let qs = quiz_sessions[nr];
       let fnr = qs.FrageNr;
       if (fnr < qs.Fragen.length) {
-        socket_user.to(qs.Room).emit('zeigeFrageAntwort', qs.Fragen[fnr], nr);
+        socket_user.to(qs.Room).emit('zeigeFrageAntwort', qs.Fragen[fnr], nr, qs);
       }
     }, 2000);
   });
@@ -127,6 +129,7 @@ socket_user.on("connection", (socket) => {
       room = room.substr(1);
     } //entferne # am Anfang
     socket.join(room);
+    room_nr = 0;
 
     if (user_in_room[0]) {
       for (i = 0; i < user_in_room.length; i++) {
@@ -239,95 +242,115 @@ socket_user.on("connection", (socket) => {
 
 
   socket.on("neueQuizSession", () => {
-    if (ready) {
-      ready = false;
-      console.log("neueQuizSession");//ooooooooo
+    console.log("neueQuizSession");//ooooooooo
 
-      neueQuizSession(room, anzahlFragen);
-    }
+    neueQuizSession(room, anzahlFragen);
 
-
-    console.log("l " + quiz_sessions.length);
     // setTimeout(() => {
     //   console.log(quiz_sessions[0]);
     // }, 1000);
 
   });
 
-  socket.on("starteQuizSession", (nr) => {
+  socket.on("starteQuizSession", (nr, qs) => {
 
     console.log("starteQuizSession");//ooooooooo
 
-    quiz_nr = nr;
-    let qs = quiz_sessions[nr];
+    // let qs = quiz_sessions[nr];
 
-    qs_geantwortet.push([0, user_in_room[room_nr][1]]);
-
-    console.log(user_in_room[room_nr][1]);
+    qs_geantwortet.push([0, user_in_room[nr][1]]);
+    console.log(user_in_room[nr][1]);
 
     socket_user.to(qs.Room).emit('platzhalter');
-    socket_host.to(qs.Room).emit('zeigeFrage', qs.Fragen[qs.FrageNr].frage, timer_quiz_frage, nr);
+    socket_host.to(qs.Room).emit('zeigeFrage', qs.Fragen[qs.FrageNr].frage, timer_quiz_frage, nr, qs);
+
+
   });
 
-  socket.on("starteNeueFrage", (nr) => {
-    // if (readyF) {
-    // readyF = false;
-    console.log("starteNeueFrage");//ooooooooo
+  socket.on("starteNeueFrage", (nr, qs) => {
 
-    let qs = quiz_sessions[nr];
-    qs_geantwortet[room_nr][0] = 0;
-    try {
-      let frage = qs.Fragen[qs.FrageNr].frage;
-      if (qs.FrageNr <= anzahlFragen) {
-        socket_user.to(qs.Room).emit('platzhalter');
-        socket_host.to(qs.Room).emit('zeigeFrage', frage, timer_quiz_frage, nr);
+    if (readyF) {
+      readyF = false;
+      qs_geantwortet[nr][0] = 0;
+      try {
+        let frage = qs.Fragen[qs.FrageNr].frage;
 
+        if (qs.FrageNr <= anzahlFragen) {
+          socket_user.to(qs.Room).emit('platzhalter');
+          socket_host.to(qs.Room).emit('zeigeFrage', frage, timer_quiz_frage, nr, qs);
+
+          if (qs.FrageNr + 1 == anzahlFragen) {
+            setTimeout(() => {
+              console.log("hier time");
+              socket_user.to(qs.Room).emit("ladeStatistik");
+              socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
+            }, timer_next_qz);
+
+          } else {
+            starteTimerStoppFrage(nr, qs);
+          }
+
+        }
+        else {
+          console.log("hier else");
+          socket_user.to(qs.Room).emit("ladeStatistik");
+          socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
+
+        }
+      } catch (error) {
+        console.log("hier x");
+        socket_user.to(qs.Room).emit("ladeStatistik");
+        socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
+        console.error("error in starteNeueFrage: " + error);
       }
-    } catch (error) {
-      socket_host.to(qs.Room).emit("zeigeStatistik", "hier kommen die Statistiken hin");
 
     }
 
-
-
   });
 
 
-  socket.on("antwort", (antw, t, nr) => {
-
+  socket.on("antwort", (antw, t, nr, qs) => {
+    console.log("Punkte: " + socket.punkte);
     let ga = 0;
     let ges = 1;
-    let qs = quiz_sessions[nr];
+    // let qs = quiz_sessions[nr];
 
 
     try {
       let correctAntw = qs.Fragen[qs.FrageNr].correct;
       if (!geantwortet) {
-
         geantwortet = true;
-        qs_geantwortet[room_nr][0] += 1;
-        ga = qs_geantwortet[room_nr][0];
-        ges = user_in_room[room_nr][1];
-        console.log(ga + " " + ges);
+        qs_geantwortet[nr][0] += 1;
+        ga = qs_geantwortet[nr][0];
+        ges = user_in_room[nr][1];
+
+        console.log(correctAntw + " <-correctAntw  antw->" + antw);
         if (correctAntw == antw) {
-          punkte += 300 - t;
+          punkte += punkte_max - t;
         }
-        console.log(ga + " von " + ges);
+
+        setTimeout(() => {
+          if (ga >= ges) {
+            readyF = true;
+            qs_geantwortet[nr][0] = 0;
+            console.log(qs.FrageNr + " Fragen von " + anzahlFragen);
+            if (qs.FrageNr + 1 >= anzahlFragen) {
+              console.log("hier c");
+              socket_user.to(qs.Room).emit("ladeStatistik");
+              socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
+
+            } else {
+              neueFage(nr, qs);
+              geantwortet = false;
+            }
+          }
+        }, 400);
+
 
       }
-      if (ga >= ges) {
-        readyF = true;
-
-        qs_geantwortet[room_nr][0] = 0;
-        geantwortet = false;
-
-        neueFage(nr);
-      }
-
     } catch (err) {
 
       readyF = true;
-
       geantwortet = false;
 
       socket_user.to(room).emit('load_content', `${options[0]}.html`, options[0]);
@@ -337,8 +360,6 @@ socket_user.on("connection", (socket) => {
       console.error("error in Antwort: " + err)
     }
 
-
-
   });
 
 
@@ -347,6 +368,9 @@ socket_user.on("connection", (socket) => {
   //   console.log(`user say: "${t}"`);
   // });
 
+  socket.on("ladeStatistik", () => {
+    socket.emit("zeigeStatistik", punkte);
+  });
 
 
   socket.on("disconnect", () => {
@@ -399,6 +423,7 @@ function getQRcode(link) {
   return qr.createImgTag("10", "0", "qrcode");
 }
 
+
 function makeid(length) {
   var result = "";
   var characters = "123456789abcdefghikmpqrstuwxyz";
@@ -410,12 +435,20 @@ function makeid(length) {
   return result;
 }
 
+function makeid2(length) {
+  var result = "";
+  var characters = "abc";
+  var charactersLength = characters.length;
+  for (var i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
 
+  return result;
+}
 
 
 function neueQuizSession(room, fragen_anzahl) {
 
-  let quiz_id = makeid(6);
   let quiz_session_number = quiz_sessions.length;
   let fragen = [];
   let aktuelleFrageNr = 0;
@@ -424,34 +457,38 @@ function neueQuizSession(room, fragen_anzahl) {
     fragen.push(getFrageAntwort(i));
   }
 
-  let quiz_session = { ID: quiz_id, Room: room, SessionNumber: quiz_session_number, Fragen: fragen, FrageNr: aktuelleFrageNr };
+  let quiz_session = { Room: room, SessionNumber: quiz_session_number, Fragen: fragen, FrageNr: aktuelleFrageNr };
 
-  quiz_sessions.push(quiz_session);
-
-  socket_user.to(room).emit('QuizSessionBereit', quiz_session_number);
+  // quiz_sessions.push(quiz_session);
+  setTimeout(() => {
+    console.log("1: " + quiz_session);
+    socket_user.to(room).emit('QuizSessionBereit', quiz_session_number, quiz_session);
+  }, 500);
 
 }
 
+function starteTimerStoppFrage(nr, qs) {
+  setTimeout(() => {
+    neueFage(nr, qs);
+  }, timer_next_qz);
+}
+
+function neueFage(nr, qs) {
+  // let qs = quiz_sessions[nr];
+  qs.FrageNr++
+  // if (qs.FrageNr < qs.Fragen.length) {
+  console.log("socket_user.to(qs.Room).emit('neueFrageBereit')")
+  socket_user.to(qs.Room).emit('neueFrageBereit', nr, qs);
+
+  let correctAntw = qs.Fragen[qs.FrageNr - 1].correct;
+  socket_host.to(qs.Room).emit("zeigeFrageAntwort", qs.Fragen[qs.FrageNr - 1], correctAntw, qs);
 
 
-function neueFage(nr) {
-  let qs = quiz_sessions[nr];
+  // } else {
+  //   socket_user.to(qs.room).emit('zeigeStatistikSeite');
+  //   socket_host.to(qs.Room).emit("zeigeStatistik", "hier kommen die Statistiken hin");
 
-  qs.FrageNr += 1;
-
-  if (qs.FrageNr < qs.Fragen.length) {
-    console.log("socket_user.to(qs.Room).emit('neueFrageBereit')")
-    socket_user.to(qs.Room).emit('neueFrageBereit');
-
-    let correctAntw = qs.Fragen[qs.FrageNr - 1].correct;
-    socket_host.to(qs.Room).emit("zeigeFrageAntwort", qs.Fragen[qs.FrageNr - 1], correctAntw);
-
-
-  } else {
-    socket_user.to(qs.room).emit('zeigeStatistikSeite');
-    socket_host.to(qs.Room).emit("zeigeStatistik", "hier kommen die Statistiken hin");
-
-  }
+  // }
 
 }
 

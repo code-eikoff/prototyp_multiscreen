@@ -535,3 +535,21 @@ Quiz Content
     
 }
 
+#punkte{
+    height: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+    margin: 0px;
+    width: 100vw;
+}
+
+#punkte .box-arround{
+    position: relative;
+    width: 100%;
+}
+
+#punkte .box-arround .row{
+    height: 100%;
+    z-index: 5;
+    font-size: 2rem;
+}

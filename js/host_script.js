@@ -244,14 +244,15 @@ function setTabbarOffset() {
 
 function initQuiz() {
   neueFrage = true;
-  socket.on("zeigeFrage", (frage, timer, nr) => {
+  socket.on("zeigeFrage", (frage, timer, nr, qs) => {
+    console.error(qs);
 
     if (!neueFrage) importContent("/client/host/Quiz.html");
     setTimeout(() => {
 
       let ready = true;
       let f = document.getElementById("frage_box");
-      let seconds = (timer / 10) + 1;
+      let seconds = (timer / 1000) + 1;
 
       f.innerHTML = String(seconds);
 
@@ -259,20 +260,20 @@ function initQuiz() {
         seconds--;
         f.innerHTML = String(seconds);
         if (seconds >= 1) {
-          setTimeout(tick, 1000);
+          setTimeout(tick, 990);
         }
         else {
           f.innerHTML = frage;
           if (ready) {
             ready = false;
-            socket.emit("set_user_antworten", nr);
+            socket.emit("set_user_antworten", nr, qs);
             neueFrage = true;
           }
         }
       }
 
       tick();
-    }, 300);
+    }, 500);
 
 
   });

@@ -437,8 +437,7 @@ function initQuiz() {
 
 
 
-  socket.on("QuizSessionBereit", (nr) => {
-    qz_nr = nr;
+  socket.on("QuizSessionBereit", (nr, qs) => {
     let losBtn = document.getElementById("los");
     losBtn.style.visibility = "visible";
 
@@ -446,12 +445,12 @@ function initQuiz() {
     losBtn.addEventListener("click", (e) => {
       if (ready) {
         ready = false;
-        socket.emit("starteQuizSession", qz_nr);
+        socket.emit("starteQuizSession", nr, qs);
       }
     });
   });
 
-  socket.on("neueFrageBereit", () => {
+  socket.on("neueFrageBereit", (nr, qs) => {
     ready = true;
     importContent('quiz.html');
     setTimeout(() => {
@@ -463,17 +462,17 @@ function initQuiz() {
       losBtn.addEventListener("click", (e) => {
         if (ready) {
           ready = false;
-          socket.emit("starteNeueFrage", qz_nr);
+          socket.emit("starteNeueFrage", nr, qs);
         }
       });
     }, 200);
 
   });
 
-  socket.on("zeigeFrageAntwort", (fa, nr) => {
+  socket.on("zeigeFrageAntwort", (fa, nr, qs) => {
     ready = true;
     importContent('QuizAntwortenBtn.html');
-    setTimeout(initFragen, 1000);
+    setTimeout(initFragen, 500);
 
     function initFragen() {
       let startTime, endTime;
@@ -499,7 +498,7 @@ function initQuiz() {
         a.addEventListener("click", () => {
           document.getElementById("content_html").innerHTML = "warten...";
 
-          socket.emit("antwort", i, stopTime(), nr);
+          socket.emit("antwort", i, stopTime(), nr, qs);
 
         });
       }
@@ -508,11 +507,59 @@ function initQuiz() {
 
   });
 
+  socket.on("ladeStatistik", () => {
+    let html =
+      `
+      <div class="row center-xs middle-xs around-xs" id="punkte">
+        <div class="col-xs-12">
+            <div class="box box-arround">
+                <div class="row middle-xs center-xs">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div id="punkte_text">Deine Punkte sind: ...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="menu_arround" id="menu">
+        <div id="back"></div>
+        <menu>
+            <div class="box">MENÜ</div>
+        </menu>
+    </div>
+    `
+    document.getElementById("content_html").innerHTML = html;
+    setTimeout(initMenu, 300);
+    socket.emit("ladeStatistik");
 
-  socket.on("platzhalter", (fa) => {
 
-    document.getElementById("content_html").innerHTML = "warten...";
+  });
 
+  socket.on("zeigeStatistik", (fa) => {
+    let html = `Deine Punkte sind: ${fa} `
+    document.getElementById("punkte_text").innerHTML = html;
+  });
+
+  socket.on("platzhalter", () => {
+    let html =
+      `
+      <div class="row center-xs middle-xs around-xs" id="punkte">
+        <div class="col-xs-12">
+            <div class="box box-arround">
+                <div class="row middle-xs center-xs">
+                    <div class="col-xs-12">
+                        <div class="box">
+                            <div>warten...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    `
+    document.getElementById("content_html").innerHTML = html;
   });
 
 
