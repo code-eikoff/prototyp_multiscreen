@@ -4,8 +4,8 @@ const parseString = require("xml2js").parseString;
 
 const qrcode = require("./qrcode");
 
-// const link_host = "ms.eikoff.de";
-const link_host = "eikoff:5500";
+const link_host = "ms.eikoff.de";
+// const link_host = "eikoff:5500";
 const link_user = link_host + "/client/user/";
 const link_host_base = "client/host/";
 
@@ -76,7 +76,7 @@ socket_host.on("connection", (socket) => {
   // let room = 'room'+client_hosts.length;
 
   let room = makeid(3);
-  room = "b";
+  // room = "b";
   user_in_room.push([room, 0]);
   socket.join(room);
 
@@ -95,7 +95,7 @@ socket_host.on("connection", (socket) => {
   socket.on("getQRCode", () => {
     let qrcode_img = getQRcode("http://" + link_user + "index.html#" + room);
     // socket_host.to(room).emit("qrimg", qrcode_img, link_user + "#" + room); //schicke qr-code img
-    socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + '.html'); //schicke qr-code img
+    socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + ''); //schicke qr-code img
   });
 
   socket.on("set_user_antworten", (nr, qs) => {
@@ -113,14 +113,14 @@ socket_host.on("connection", (socket) => {
 
   //wenn der Host sich trennt
   socket.on("disconnect", () => {
-    client_hosts.pop(socket);
-    // fs.unlink(`${room}.html`, (err) => {
-    //   if (err) {
-    //     console.error(err)
-    //     return
-    //   }
-    // })
+    fs.unlink(`${room}.html`, (err) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+    })
 
+    client_hosts.pop(socket);
   });
 
 
@@ -572,7 +572,7 @@ erstelle eine zufällige id
 */
 function makeid(length) {
   var result = "";
-  var characters = "123456789abcdefghikmpqrstuwxyz";
+  var characters = "abcdefghikmpqrstuwxyz";
   var charactersLength = characters.length;
   for (var i = 0; i < length; i++) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));

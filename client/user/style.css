@@ -67,6 +67,11 @@ h1, h2, h3, h4 {
   width: 100vw;
 }
 
+#start-bt #los{
+        height:9vh;
+        line-height: 9vh;
+    }
+
 #start-bt .box-arround {
   position: relative;
   height: 9vh;

@@ -1,3 +1,4 @@
+// const { read } = require("fs");
 
 const button = document.getElementById("los");
 const xwiper = new Xwiper("#content", 8);
@@ -10,9 +11,20 @@ let options = ["home"];
 
 let elm, tabs, tabsControls = null;
 
-const socket = io("http://eikoff:3030/user");
+const socket = io("http://ms.eikoff.de:3030/user");
 window.addEventListener("load", socket.emit("user_connect", window.location.hash));
 window.onhashchange = () => socket.emit("user_connect", window.location.hash);
+
+setTimeout(() => {
+  ga('create', 'UA-141496757-3', 'auto');
+  console.log('ga')
+  // ga('UA-141496757-3.send', {
+  //   hitType: 'event',
+  //   eventCategory: 'Page',
+  //   eventAction: 'load',
+  //   eventLabel: 'home'
+  // });
+}, 700);
 
 
 
@@ -25,13 +37,13 @@ button.addEventListener("click", (e) => {
   var doc = window.document;
   var docEl = doc.documentElement;
 
-  // var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-  // var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
+  var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+  var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
 
-  // if (
-  //   !doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-  //   requestFullScreen.call(docEl);
-  // }
+  if (
+    !doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
+    requestFullScreen.call(docEl);
+  }
 
   socket.emit('start');
   // socket.emit("lade_Seite", "quiz");
@@ -50,6 +62,7 @@ socket.on("load_content", (html_link, name, data) => {
   importContent(html_link);
   currentMenuName = name;
   initContent(name, data);
+
 });
 
 
@@ -76,6 +89,11 @@ function importContent(link) {
 
 
 function initContent(name, data) {
+
+
+  ga('send', 'pageview', `/` + name);
+
+  console.log(name);
 
   switch (name) {
     // options[0] ist immer die startseite (das Hauptmenü)
@@ -159,9 +177,11 @@ function initHome() {
 
 }
 
-
+/*
+Registerkarten
+*/
 function initOpt01() {
-
+  let ready = true;
   initMenu();
   elem = document.querySelector('.tabs');
 
@@ -178,14 +198,17 @@ function initOpt01() {
   setTimeout(setTabbarOffset, 300);
 
   socket.on("change_Slide", (nr) => {
+
     currentSlideIndex = nr;
     tabs.show(currentSlideIndex);
     setTabbarOffset();
 
+    ready = true;
     let e = document.getElementsByClassName("tabs__line");
     e[0].style.width = tabsControls[currentSlideIndex].offsetWidth + "px";
     e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
-    // socket.emit("say", tabsControls[currentSlideIndex].offsetWidth)
+
+    ga('send', 'event', 'interaction', 'tabs', 'Tabs slidechange', 0);
   });
 
   tabsControls = elem.getElementsByClassName("tabs__controls");
@@ -193,7 +216,10 @@ function initOpt01() {
   for (let i = 0; i < tabsControls.length; i++) {
 
     tabsControls[i].addEventListener("click", (e) => {
-      socket.emit('slideChange', i);
+      if (ready) {
+        ready = false;
+        socket.emit('slideChange', i);
+      }
     });
   }
 
@@ -206,21 +232,27 @@ function initMapController() {
   initMenu();
 
   document.getElementById('btn_up').addEventListener("click", (e) => {
+    ga('send', 'event', 'interaction', 'mapControl', 'Map up', 0);
     socket.emit('mapControl', 'up');
   });
   document.getElementById('btn_left').addEventListener("click", (e) => {
+    ga('send', 'event', 'interaction', 'mapControl', 'Map left', 0);
     socket.emit('mapControl', 'left');
   });
   document.getElementById('btn_right').addEventListener("click", (e) => {
+    ga('send', 'event', 'interaction', 'mapControl', 'Map right', 0);
     socket.emit('mapControl', 'right');
   });
   document.getElementById('btn_down').addEventListener("click", (e) => {
+    ga('send', 'event', 'interaction', 'mapControl', 'Map down', 0);
     socket.emit('mapControl', 'down');
   });
   document.getElementById('btn_in').addEventListener("click", (e) => {
+    ga('send', 'event', 'interaction', 'mapControl', 'Map in', 0);
     socket.emit('mapControl', 'in');
   });
   document.getElementById('btn_out').addEventListener("click", (e) => {
+    ga('send', 'event', 'interaction', 'mapControl', 'Map out', 0);
     socket.emit('mapControl', 'out');
   });
 
@@ -303,6 +335,7 @@ function btnClick(option, slide) {
 }
 
 function itemGaClick(a, b) {
+  ga('send', 'event', 'interaction', 'tabs', 'Tabs Unterthemen', 0);
   socket.emit('details_Tabs', a, b);
 }
 
@@ -310,6 +343,7 @@ function itemGaClick(a, b) {
 function initMenu() {
   let menu = document.getElementById("menu").getElementsByTagName('menu');
   menu[0].addEventListener("click", (e) => {
+    ga('send', 'event', 'interaction', 'menü', 'Menü click', 0);
     e.stopImmediatePropagation();
     btnClick(options[0]);
   });
@@ -324,6 +358,7 @@ function initBack() {
     bc.addEventListener("click", (e) => {
       e.stopImmediatePropagation();
       currentSlideIndex = 0;
+      ga('send', 'event', 'interaction', 'menü', 'Menü back', 0);
 
       switch (backButtonLoc) {
         case 'home':
@@ -426,6 +461,7 @@ function initQuiz() {
       if (ready) {
         ready = false;
         socket.emit("starteQuizSession", nr, qs);
+        ga('send', 'event', 'quiz', 'session', 'Quiz start', 0);
       }
     });
   });
@@ -442,6 +478,7 @@ function initQuiz() {
       losBtn.addEventListener("click", (e) => {
         if (ready) {
           ready = false;
+          ga('send', 'event', 'interaction', 'quiz', 'Qiz starteNeueFrage', 0);
           socket.emit("starteNeueFrage", nr, qs);
         }
       });
@@ -477,6 +514,7 @@ function initQuiz() {
         a_text.innerHTML = fa.antworten[i];
         a.addEventListener("click", () => {
           document.getElementById("content_html").innerHTML = "warten...";
+          ga('send', 'event', 'interaction', 'quiz', 'Quiz antwort', 0);
 
           socket.emit("antwort", i, stopTime(), nr, qs);
 
@@ -518,6 +556,8 @@ function initQuiz() {
   });
 
   socket.on("zeigeStatistik", (fa) => {
+    ga('send', 'event', 'interaction', 'quiz', 'Quiz beendet', 0);
+
     let html = `Deine Punkte sind: ${fa} `
     document.getElementById("punkte_text").innerHTML = html;
   });
@@ -565,10 +605,11 @@ function initThemenueb(themen) {
       let a = document.getElementById(`btn-${i}`);
 
       let ueb = a.getElementsByClassName("text_ueb")[0];
-      ueb.innerHTML = themen.Name[i - 1];;
+      ueb.innerHTML = themen.Name[i - 1];
       ueb.style.opacity = 1;
       a.addEventListener("click", (e) => {
-        e.stopImmediatePropagation();
+        ga('send', 'event', 'interaction', 'themenübersicht', 'Themenueb Thema öffnen', 0);
+
         a.classList.add("btn-active");
         socket.emit("themaÖffnen", i - 1);
       });
@@ -657,6 +698,7 @@ function initGalerie(galerie) {
 
 
   function prevPic() {
+    ga('send', 'event', 'interaction', 'galerie', 'Galerie prevPic', 0);
 
     if (nummer >= 1) nummer--;
     else nummer = galerie.bild.length - 1;
@@ -675,6 +717,7 @@ function initGalerie(galerie) {
   }
 
   function nextPic() {
+    ga('send', 'event', 'interaction', 'galerie', 'Galerie nextPic', 0);
 
     if (nummer < galerie.bild.length - 1) nummer++;
     else nummer = 0;
@@ -718,7 +761,7 @@ socket.on("refresh", () => {
 
 
 xwiper.onSwipeLeft(() => {
-  socket.emit('say', 'Swiped left')
+  ga('send', 'event', 'interaction', 'swipe', 'swipe left', 0);
   switch (currentMenuName) {
     // options[0] ist immer die startseite (das Hauptmenü)
     case options[1]:
@@ -738,7 +781,8 @@ xwiper.onSwipeLeft(() => {
 });
 
 xwiper.onSwipeRight(() => {
-  socket.emit('say', 'Swiped r');
+  ga('send', 'event', 'interaction', 'swipe', 'swipe right', 0);
+
   switch (currentMenuName) {
 
     // options[0] ist immer die startseite (das Hauptmenü)
@@ -758,7 +802,8 @@ xwiper.onSwipeRight(() => {
 });
 
 xwiper.onSwipeUp(() => {
-  socket.emit('say', 'Swiped u')
+  ga('send', 'event', 'interaction', 'swipe', 'swipe up', 0);
+
   switch (currentMenuName) {
 
     // options[0] ist immer die startseite (das Hauptmenü)
@@ -778,7 +823,8 @@ xwiper.onSwipeUp(() => {
 });
 
 xwiper.onSwipeDown(() => {
-  socket.emit('say', 'Swiped d')
+  ga('send', 'event', 'interaction', 'swipe', 'swipe down', 0);
+
   switch (currentMenuName) {
 
     // options[0] ist immer die startseite (das Hauptmenü)

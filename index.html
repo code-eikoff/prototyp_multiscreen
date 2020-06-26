@@ -2,6 +2,17 @@
 <html lang="de">
 
 <head>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141496757-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-141496757-3');
+  </script>
+
   <link rel="stylesheet" href="/node_modules/flexboxgrid/css/flexboxgrid.min.css" type="text/css" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
     integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
@@ -16,7 +27,7 @@
     </script>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="http://eikoff:3030/socket.io/socket.io.js"></script>
+  <script src="http://ms.eikoff.de:3030/socket.io/socket.io.js"></script>
 </head>
 
 <body>
@@ -55,6 +66,12 @@
         einfach den Link im mobilen Browser eingeben.
       </div>
       <div id="border" class="hidden"></div>
+      <div id="cookies">
+        <p>Diese Anwendung verwendet Cookies und trackt die Eingaben zu Testzwecken.</p>
+        <p>Durch das Starten der Anwendung erklären Sie sich mit der Verwendung von Cookies und dem Tracking
+          einverstanden. Detaillierte Informationen und wie Sie der Verwendung jederzeit widersprechen können, finden
+          Sie auf dsgvo.eikoff.de</p>
+      </div>
     </div>
   </div>
 

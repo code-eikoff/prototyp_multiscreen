@@ -27,6 +27,15 @@ p{
     margin-block-end: 0px;
 }
 
+#cookies{
+    position: absolute;
+    width: 212px;
+    padding: 20px;
+    background-color: #b9e97a57;
+    font-size: 0.7rem;
+    line-height: 0.8rem;
+}
+
 .hidden {
   visibility: hidden;
   display: none;
@@ -538,7 +547,7 @@ Themenübersicht
   font-weight: 400;
   padding:10px;
   line-height: 1.25rem;
-
+overflow:hidden;
 }
 #chose .thueb_text h2{
   margin:10px 0px;

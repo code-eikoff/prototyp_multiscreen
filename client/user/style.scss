@@ -71,7 +71,10 @@ h1, h2, h3, h4 {
     padding-left: 100px;
     padding-right: 100px;
     margin: 0px;
-    width: 100vw;
+    width: 100vw;    #los{
+        height:9vh;
+        line-height: 9vh;
+    }
 }
 
 #start-bt .box-arround{

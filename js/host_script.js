@@ -7,7 +7,7 @@ let options = ["home"];
 
 // console.time();
 
-const socket = io("http://eikoff:3030/host");
+const socket = io("http://ms.eikoff.de:3030/host");
 
 socket.emit("getQRCode");
 
@@ -252,7 +252,6 @@ function initQuiz() {
 
   //zeigt eine neue Frage an
   socket.on("zeigeFrage", (frage, timer, nr, qs) => {
-    console.error(qs);
 
     if (!neueFrage) importContent("/client/host/Quiz.html");
 
@@ -290,7 +289,6 @@ function initQuiz() {
   });
 
   socket.on("zeigeFrageAntwort", (fa, correct) => {
-    console.log(neueFrage + " " + fa)
     if (neueFrage) {
       neueFrage = false;
       importContent('/client/host/QuizAntwortenBtn.html');
