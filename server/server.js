@@ -23,17 +23,26 @@ let quiz_sessions = [];
 let qs_geantwortet = [];
 const timer_quiz_frage = 3000; //ms
 const timer_next_qz = 15000 + timer_quiz_frage; //ms
-const anzahlFragen = 3;
+const anzahlFragen = 5;
 const punkte_max = timer_next_qz / 100;
 
 const options = [
   "home",
-  "Detailansicht",
   "Lageplan",
-  "Quiz",
   "Themenübersicht",
-  "Galerie"
+  "Detailansicht",
+  "Galerie",
+  "Quiz"
+
+  // "home",
+  // "Detailansicht",
+  // "Lageplan",
+  // "Quiz",
+  // "Themenübersicht",
+  // "Galerie"
 ];
+
+
 
 const themenueb = {
   Name: [],
@@ -117,15 +126,15 @@ socket_host.on("connection", (socket) => {
     }, 2000);
   });
 
+  socket.on("getrennt", () => {
+    console.log("getrennt");
+    deleteRoom(room)
+    client_hosts.pop(socket);
+  });
 
   //wenn der Host sich trennt
   socket.on("disconnect", () => {
-    fs.unlink(`${room}.html`, (err) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-    })
+    deleteRoom(room)
     client_hosts.pop(socket);
   });
 
@@ -201,7 +210,6 @@ socket_user.on("connection", (socket) => {
           user_in_room[i][1] -= 1;
           if (user_in_room[i][1] < 1) {
             socket_host.to(room).emit("getrennt");
-            deleteRoom(room);
             try {
               if (qs_geantwortet[room_nr][1]) {
                 qs_geantwortet[room_nr][1] -= 1;
@@ -234,7 +242,7 @@ socket_user.on("connection", (socket) => {
     socket_host.to(room).emit('load_options', options);
 
     socket_user.to(room).emit('load_content', `${link_user2 + options[0]}.html`, 'home');
-    socket_host.to(room).emit("load_content", link_host_base + "index.html");
+    socket_host.to(room).emit("load_content", link_host_base + "index.html", 'home');
   });
 
   // wenn ein button der Themen-Auswahl im Hauptmenü geklickt wird
@@ -246,34 +254,34 @@ socket_user.on("connection", (socket) => {
         socket_host.to(room).emit("load_content", `${link_host_base}index.html`, options[0]);
         break;
 
-      case options[1]: //"kaiserpf"
+      case "Detailansicht": //"kaiserpf"
         if (slide) {
-          socket_user.to(room).emit('load_content', `${link_user2 + options[1]}.html`, options[1], slide);
-          socket_host.to(room).emit("load_content", `${link_host_base}${options[1]}.html`, options[1], slide);
+          socket_user.to(room).emit('load_content', `${link_user2}Detailansicht.html`, "Detailansicht", slide);
+          socket_host.to(room).emit("load_content", `${link_host_base}Detailansicht".html`, "Detailansicht", slide);
         } else {
-          socket_user.to(room).emit('load_content', `${link_user2 + options[1]}.html`, options[1]);
-          socket_host.to(room).emit("load_content", `${link_host_base}${options[1]}.html`, options[1]);
+          socket_user.to(room).emit('load_content', `${link_user2}Detailansicht.html`, "Detailansicht");
+          socket_host.to(room).emit("load_content", `${link_host_base}Detailansicht.html`, "Detailansicht");
         }
         break;
 
-      case options[2]: //"lageplan"
-        socket_user.to(room).emit('load_content', `${link_user2 + options[2]}.html`, options[2]);
-        socket_host.to(room).emit("load_content", `${link_host_base}${options[2]}.html`, options[2]);
+      case "Lageplan": //"lageplan"
+        socket_user.to(room).emit('load_content', `${link_user2}Lageplan.html`, "Lageplan");
+        socket_host.to(room).emit("load_content", `${link_host_base}Lageplan.html`, "Lageplan");
         break;
 
-      case options[3]: //"quiz"
-        socket_user.to(room).emit('load_content', `${link_user2 + options[3]}.html`, options[3]);
-        socket_host.to(room).emit("load_content", `${link_host_base}${options[3]}.html`, options[3]);
+      case "Quiz": //"quiz"
+        socket_user.to(room).emit('load_content', `${link_user2}Quiz.html`, "Quiz");
+        socket_host.to(room).emit("load_content", `${link_host_base}Quiz.html`, "Quiz");
         break;
 
-      case options[4]://themenübersicht
-        socket_user.to(room).emit('load_content', `${link_user2 + options[4]}.html`, options[4], themenueb);
-        socket_host.to(room).emit("load_content", `${link_host_base}${options[4]}.html`, options[4], themenueb);
+      case "Themenübersicht"://themenübersicht
+        socket_user.to(room).emit('load_content', `${link_user2}Themenübersicht.html`, "Themenübersicht", themenueb);
+        socket_host.to(room).emit("load_content", `${link_host_base}Themenübersicht.html`, "Themenübersicht", themenueb);
         break;
 
-      case options[5]://galerie
-        socket_user.to(room).emit('load_content', `${link_user2 + options[5]}.html`, options[5], galerie);
-        socket_host.to(room).emit("load_content", `${link_host_base}${options[5]}.html`, options[5], galerie);
+      case "Galerie"://galerie
+        socket_user.to(room).emit('load_content', `${link_user2}Galerie.html`, "Galerie", galerie);
+        socket_host.to(room).emit("load_content", `${link_host_base}Galerie.html`, "Galerie", galerie);
         break;
 
       default:
@@ -303,8 +311,8 @@ socket_user.on("connection", (socket) => {
   });
 
   socket.on("details_Tabs", (nr, slide) => {
-    socket_user.to(room).emit('load_content', `${link_user2}details/${options[1]}_${nr}.html`, options[1] + '_details', slide);
-    socket_host.to(room).emit('load_content', `${link_host_base}details/${options[1]}_${nr}.html`, options[1] + '_details', slide);
+    socket_user.to(room).emit('load_content', `${link_user2}details/Detailansicht_${nr}.html`, "Detailansicht" + '_details', slide);
+    socket_host.to(room).emit('load_content', `${link_host_base}details/Detailansicht_${nr}.html`, "Detailansicht" + '_details', slide);
   });
 
   socket.on("scrollToItem", (i) => {
@@ -433,13 +441,13 @@ socket_user.on("connection", (socket) => {
 
         }
         else {
-          console.log("hier else");
+          stopTimerQz();
           socket_user.to(qs.Room).emit("ladeStatistik");
           socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
 
         }
       } catch (error) {
-        console.log("hier x");
+        stopTimerQz();
         socket_user.to(qs.Room).emit("ladeStatistik");
         socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
         console.error("error in starteNeueFrage: " + error);
@@ -474,7 +482,7 @@ socket_user.on("connection", (socket) => {
             qs_geantwortet[nr][0] = 0;
             console.log(qs.FrageNr + " Fragen von " + anzahlFragen);
             if (qs.FrageNr + 1 >= anzahlFragen) {
-              console.log("hier c");
+              stopTimerQz();
               socket_user.to(qs.Room).emit("ladeStatistik");
               socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
 
@@ -503,6 +511,7 @@ socket_user.on("connection", (socket) => {
   });
 
   socket.on("ladeStatistik", () => {
+    stopTimerQz();
     socket.emit("zeigeStatistik", Math.round((punkte / 10)));
   });
 
@@ -522,7 +531,7 @@ socket_user.on("connection", (socket) => {
 
   */
   socket.on("themaÖffnen", (i) => {
-    socket_user.to(room).emit('load_content', `${link_user2}details/${themenueb.Link[i]}`, `${options[4]}_details`);
+    socket_user.to(room).emit('load_content', `${link_user2}details/${themenueb.Link[i]}`, `Themenübersicht_details`);
   });
 
 

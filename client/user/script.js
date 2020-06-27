@@ -92,32 +92,32 @@ function initContent(name, data) {
       break;
 
     //Registerkarten
-    case options[1]:
+    case "Detailansicht":
       backButtonLoc = options[0];
       setTimeout(initOpt01, 300);
       break;
 
     //Registerkarten Details
-    case (options[1] + '_details'):
+    case ("Detailansicht_details"):
       currentSlideIndex = data;
-      backButtonLoc = options[1];
+      backButtonLoc = "Detailansicht";
       setTimeout(initOpt01, 300);
       break;
 
     // Lageplan
-    case options[2]:
+    case "Lageplan":
       backButtonLoc = options[0];
       setTimeout(initMapController, 300);
       break;
 
     //Quiz
-    case options[3]:
+    case "Quiz":
       backButtonLoc = options[0];
       setTimeout(initQuiz, 300);
       break;
 
     //Themenübersicht
-    case options[4]:
+    case "Themenübersicht":
       backButtonLoc = options[0];
       setTimeout(() => {
         initThemenueb(data)
@@ -125,15 +125,15 @@ function initContent(name, data) {
       break;
 
     //Themenübersicht UnterMenü
-    case (`${options[4]}_details`):
-      backButtonLoc = `${options[4]}_d`;
+    case (`Themenübersicht_details`):
+      backButtonLoc = `Themenübersicht_d`;
       setTimeout(() => {
         initThema();
       }, 300);
       break;
 
     //Galerie
-    case options[5]:
+    case "Galerie":
       backButtonLoc = options[0];
       setTimeout(() => {
         initGalerie(data);
@@ -355,12 +355,12 @@ function initBack() {
           btnClick(options[0], '0');
           break;
 
-        case options[1]:
-          btnClick(options[1], '0');
+        case "Detailansicht":
+          btnClick("Detailansicht", '0');
           break;
 
-        case `${options[4]}_d`:
-          btnClick(options[4], '0');
+        case `Themenübersicht_d`:
+          btnClick("Themenübersicht", '0');
           break;
 
         default:
@@ -458,7 +458,7 @@ function initQuiz() {
 
   socket.on("neueFrageBereit", (nr, qs) => {
     ready = true;
-    importContent('Quiz.html');
+    importContent('/client/user/Quiz.html');
     setTimeout(() => {
       let losBtn = document.getElementById("los");
 
@@ -478,7 +478,7 @@ function initQuiz() {
 
   socket.on("zeigeFrageAntwort", (fa, nr, qs) => {
     ready = true;
-    importContent('QuizAntwortenBtn.html');
+    importContent('/client/user/QuizAntwortenBtn.html');
     setTimeout(initFragen, 500);
 
     function initFragen() {
@@ -754,10 +754,10 @@ xwiper.onSwipeLeft(() => {
   ga('send', 'event', 'interaction', 'swipe', 'swipe left', 0);
   switch (currentMenuName) {
     // options[0] ist immer die startseite (das Hauptmenü)
-    case options[1]:
+    case "Detailansicht":
       nextSlide();
       break;
-    case options[2]:
+    case "Lageplan":
       socket.emit('mapControl', 'right');
       break;
 
@@ -776,11 +776,11 @@ xwiper.onSwipeRight(() => {
   switch (currentMenuName) {
 
     // options[0] ist immer die startseite (das Hauptmenü)
-    case options[1]:
+    case "Detailansicht":
       prevSlide();
       break;
 
-    case options[2]:
+    case "Lageplan":
       socket.emit('mapControl', 'left');
       break;
 
@@ -797,11 +797,11 @@ xwiper.onSwipeUp(() => {
   switch (currentMenuName) {
 
     // options[0] ist immer die startseite (das Hauptmenü)
-    case options[1]:
+    case "Detailansicht":
 
       break;
 
-    case options[2]:
+    case "Lageplan":
       socket.emit('mapControl', 'down');
       break;
 
@@ -818,10 +818,10 @@ xwiper.onSwipeDown(() => {
   switch (currentMenuName) {
 
     // options[0] ist immer die startseite (das Hauptmenü)
-    case options[1]:
+    case "Detailansicht":
       break;
 
-    case options[2]:
+    case "Lageplan":
       socket.emit('mapControl', 'up');
       break;
 

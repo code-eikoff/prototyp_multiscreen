@@ -78,35 +78,36 @@ function initContent(name, data) {
   switch (name) {
     // options[0] ist immer die startseite (das Hauptmenü)
 
-    case options[0]:
+    case "home":
       currentSlideIndex = 0;
+      setTimeout(initHome, 400);
       break;
 
-    case options[1]: //Detailansicht Kaiserpfalz
+    case "Detailansicht": //Detailansicht Kaiserpfalz
       if (data) currentSlideIndex = data;
       setTimeout(initOpt01, 400);
       break;
 
-    case (`${options[1]}_details`)://Detailansicht Kaiserpfalz_details
+    case (`Detailansicht_details`)://Detailansicht Kaiserpfalz_details
       if (data) currentSlideIndex = data;
       setTimeout(initOpt01, 400);
       break;
 
-    case options[2]: //Lageplan
+    case "Lageplan": //Lageplan
       setTimeout(initOptMap, 400);
       break;
 
-    case options[3]://Quiz
+    case "Quiz"://Quiz
       setTimeout(initQuiz, 400);
       break;
 
-    case options[4]: //"Themenübersicht"
+    case "Themenübersicht": //
       setTimeout(() => {
         initThemenueb(data);
       }, 40);
       break;
 
-    case options[5]: //Galerie
+    case "Galerie": //Galerie
       setTimeout(() => initGalerie(data), 40);
       break;
 
@@ -114,8 +115,18 @@ function initContent(name, data) {
     // wenn nichts definiert wird --> zurück zum hauptmenü
     default:
       currentSlideIndex = 0;
+      setTimeout(initHome, 400);
   }
 }
+
+function initHome() {
+  for (let i = 1; i <= 5; i++) {
+    let txt = document.getElementById(`btn-${i}`);
+    txt.innerHTML = options[i];
+  }
+}
+
+
 
 // R e g i s t e r k a r t e n
 function initOpt01() {
