@@ -1,4 +1,3 @@
-// const { read } = require("fs");
 
 const button = document.getElementById("los");
 const xwiper = new Xwiper("#content", 8);
@@ -12,18 +11,13 @@ let options = ["home"];
 let elm, tabs, tabsControls = null;
 
 const socket = io("http://ms.eikoff.de:3030/user");
-window.addEventListener("load", socket.emit("user_connect", window.location.hash));
+// window.addEventListener("load", socket.emit("user_connect", window.location.hash));
+window.addEventListener("load", socket.emit("user_connect", window.location.href));
+console.log(window.location.href)
 window.onhashchange = () => socket.emit("user_connect", window.location.hash);
 
 setTimeout(() => {
   ga('create', 'UA-141496757-3', 'auto');
-  console.log('ga')
-  // ga('UA-141496757-3.send', {
-  //   hitType: 'event',
-  //   eventCategory: 'Page',
-  //   eventAction: 'load',
-  //   eventLabel: 'home'
-  // });
 }, 700);
 
 
@@ -58,7 +52,6 @@ socket.on("vibrate", (pattern) => {
 socket.on("load_options", (data) => options = data);
 
 socket.on("load_content", (html_link, name, data) => {
-
   importContent(html_link);
   currentMenuName = name;
   initContent(name, data);
@@ -90,10 +83,7 @@ function importContent(link) {
 
 function initContent(name, data) {
 
-
   ga('send', 'pageview', `/` + name);
-
-  console.log(name);
 
   switch (name) {
     // options[0] ist immer die startseite (das Hauptmenü)

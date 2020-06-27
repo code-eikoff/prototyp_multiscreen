@@ -121,15 +121,20 @@ function initContent(name, data) {
 function initOpt01() {
 
   let elem = document.getElementById("tabs_host");
-  let tabs = new TabsSlider(elem, {
-    animate: true,
-    slide: currentSlideIndex,
-    draggable: false,
-    underline: true,
-    heightAnimate: true,
-    duration: 600,
-    easing: 'cubic-bezier(0.0, 0.0, 0.2, 1)'
-  });
+  try {
+    let tabs = new TabsSlider(elem, {
+      animate: true,
+      slide: currentSlideIndex,
+      draggable: false,
+      underline: true,
+      heightAnimate: true,
+      duration: 600,
+      easing: 'cubic-bezier(0.0, 0.0, 0.2, 1)'
+    });
+  } catch (error) {
+    console.log(error);
+  }
+
 
   setTimeout(setTabbarOffset, 300);
 
@@ -164,63 +169,168 @@ function initOpt01() {
 
 // L a g e p l a n
 function initOptMap() {
-  let mymap = L.map('mapid').setView([51.9050, 10.4281], 17);
+  let mymap;
+  try {
+    mymap = L.map('mapid').setView([51.9045, 10.4281], 17);
 
-  L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-    maxZoom: 20,
-    minZoom: 16,
-    id: 'mapbox/streets-v11',
-    tileSize: 512,
-    zoomOffset: -1,
-    accessToken: 'pk.eyJ1IjoiZWZma2ZmIiwiYSI6ImNrYm0wNnFxdDBnaGQycnBvenV0b2J2bnIifQ.vQjzCC0bOtce9bQYQ_AvSQ'
-  }).addTo(mymap);
+    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+      attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+      maxZoom: 20,
+      minZoom: 16,
+      id: 'mapbox/streets-v11',
+      tileSize: 512,
+      zoomOffset: -1,
+      accessToken: 'pk.eyJ1IjoiZWZma2ZmIiwiYSI6ImNrYm0wNnFxdDBnaGQycnBvenV0b2J2bnIifQ.vQjzCC0bOtce9bQYQ_AvSQ'
+    }).addTo(mymap);
 
-  // var marker = L.marker([51.902887, 10.425524]).addTo(mymap);
-  // marker.bindPopup("<b>Kaiserpfalz</b><br>Hier könnte eine verlinkung drin sein");
 
-  var popupLocation1 = new L.LatLng(51.902887, 10.425524);
-  var popupLocation2 = new L.LatLng(51.905573, 10.427703);
-
-  var popupContent1 = '<b>Kaiserpfalz</b><br>Hier stehen grobe Details',
-    popup1 = new L.Popup({
-      closeOnClick: false,
-      autoClose: false
+    let location = L.icon({
+      iconUrl: '/img/standort.png',
+      iconSize: [72, 100], // size of the icon
+      iconAnchor: [36, 100], // point of the icon which will correspond to marker's location
     });
-  popup1.setLatLng(popupLocation1);
-  popup1.setContent(popupContent1);
-
-  var popupContent2 = '<b>Marktkirche</b><br>Hier könnte Ihre Werbung stehen',
-    popup2 = new L.Popup({
-      closeOnClick: false,
-      autoClose: false
+    let stand = L.marker([51.902759, 10.428433], {
+      icon: location,
+      forceZIndex: 1000
     });
 
-  popup2.setLatLng(popupLocation2);
-  popup2.setContent(popupContent2);
 
-  mymap.addLayer(popup1).addLayer(popup2);
+    var popupLocation1 = new L.LatLng(51.902887, 10.425524);
+    var popupLocation2 = new L.LatLng(51.905673, 10.427703);
 
-  var polylinePoints = [
-    [51.905377, 10.427435],
-    [51.905245, 10.427627],
-    [51.904801, 10.427891],
-    [51.904281, 10.427821],
-    [51.903472, 10.427886],
-    [51.903386, 10.427447],
-    [51.903304, 10.427444],
-    [51.903160, 10.426402],
-    [51.903199, 10.425985],
-    [51.903056, 10.425678]
-  ];
+    var popupContent1 = '<b>Kaiserpfalz</b><br>Hier stehen grobe Details',
+      popup1 = new L.Popup({
+        closeOnClick: false,
+        autoClose: false,
+        forceZIndex: 100
+      });
+    popup1.setLatLng(popupLocation1);
+    popup1.setContent(popupContent1);
 
-  mymap.addLayer(L.polyline(polylinePoints));
+    var popupContent2 = '<b>Marktkirche</b><br>Hier stehen grobe Details',
+      popup2 = new L.Popup({
+        closeOnClick: false,
+        autoClose: false,
+        forceZIndex: 100
+      });
+
+    popup2.setLatLng(popupLocation2);
+    popup2.setContent(popupContent2);
 
 
+    var popup3 = L.popup({
+      closeOnClick: false,
+      autoClose: false,
+      forceZIndex: 100
+    })
+      .setLatLng([51.905941, 10.429067])
+      .setContent("<b>Marktplatz</b><br>Hier stehen grobe Details");
+    mymap.addLayer(popup3);
 
-  socket.on("panBy", (i) => {
-    mymap.panBy(i);
-  });
+    var popup4 = L.popup({
+      closeOnClick: false,
+      autoClose: false,
+      forceZIndex: 100
+    })
+      .setLatLng([51.903271, 10.427731])
+      .setContent("<b>Domvorhalle</b><br>Hier stehen grobe Details");
+    mymap.addLayer(popup4);
+
+    mymap.addLayer(popup1).addLayer(popup2);
+
+    var polylinePoints = [
+      [51.905943, 10.42907],
+      [51.905723, 10.428914],
+      [51.905607, 10.428724],
+      [51.905413, 10.428284],
+      [51.905249, 10.427552],
+      [51.905153, 10.427659],
+      [51.90499, 10.427769],
+      [51.904612, 10.42789],
+      [51.904225, 10.427814],
+      [51.903474, 10.427879],
+      [51.903373, 10.427401],
+      [51.903328, 10.427415],
+      [51.903173, 10.426707],
+      [51.903189, 10.426009],
+      [51.903087, 10.425615],
+      [51.902605, 10.425918],
+      [51.902489, 10.426438],
+      [51.902517, 10.426996],
+      [51.902507, 10.427275],
+      [51.902622, 10.42742],
+      [51.902709, 10.427659],
+      [51.902794, 10.428348]
+    ];
+
+    mymap.addLayer(L.polyline(polylinePoints, {
+      color: 'red'
+    }));
+
+
+    // function onMapClick(e) {
+    //   alert(e.latlng);
+    // }
+
+    // mymap.on('click', onMapClick);
+
+
+    var marktkirche = L.polygon([
+      [51.905575, 10.427334],
+      [51.905593, 10.427434],
+      [51.905611, 10.427423],
+      [51.905709, 10.427814],
+      [51.905702, 10.427822],
+      [51.905761, 10.428068],
+      [51.905694, 10.428113],
+      [51.905687, 10.428168],
+      [51.90565, 10.428195],
+      [51.90562, 10.428163],
+      [51.905587, 10.428036],
+      [51.90557, 10.428085],
+      [51.905532, 10.428075],
+      [51.905516, 10.428084],
+      [51.90549, 10.427959],
+      [51.905479, 10.427962],
+      [51.905386, 10.427566],
+      [51.905398, 10.427554],
+      [51.905377, 10.427456]
+    ]);
+    var pfalz = L.polygon([
+      [51.903116, 10.425168],
+      [51.903173, 10.425418],
+      [51.902694, 10.425725],
+      [51.902703, 10.425784],
+      [51.902513, 10.425905],
+      [51.902497, 10.425854],
+      [51.902413, 10.42591],
+      [51.902398, 10.426037],
+      [51.902349, 10.426047],
+      [51.902318, 10.426008],
+      [51.902302, 10.425949],
+      [51.902325, 10.425878],
+      [51.902325, 10.425878],
+      [51.902536, 10.425761],
+      [51.902487, 10.425567]
+    ]);
+    var dom = L.polygon([
+      [51.903261, 10.42762],
+      [51.903288, 10.427845],
+      [51.903188, 10.427877],
+      [51.903161, 10.427653]
+    ]);
+    mymap.addLayer(marktkirche);
+    mymap.addLayer(pfalz);
+    mymap.addLayer(dom);
+
+    mymap.addLayer(stand);
+    socket.on("panBy", (i) => {
+      mymap.panBy(i);
+    });
+  } catch (error) {
+    console.log('Map init');
+  }
+
 
   socket.on("zoom", (z) => {
     switch (z) {
@@ -234,6 +344,22 @@ function initOptMap() {
         console.log("out of options... in zoom");
     }
   });
+
+
+  // Force zIndex of Leaflet
+  (function (global) {
+    var MarkerMixin = {
+      _updateZIndex: function (offset) {
+        this._icon.style.zIndex = this.options.forceZIndex ? (this.options.forceZIndex + (this.options.zIndexOffset || 0)) : (this._zIndex + offset);
+      },
+      setForceZIndex: function (forceZIndex) {
+        this.options.forceZIndex = forceZIndex ? forceZIndex : null;
+      }
+    };
+    if (global) global.include(MarkerMixin);
+  })(L.Marker);
+
+
 
 }
 

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-141496757-3"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+
+    gtag('config', 'UA-141496757-3');
+  </script>
+  <!-- Google Tag Manager -->
+  <script>(function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-K8MPQTW');</script>
+  <!-- End Google Tag Manager -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="stylesheet" href="/node_modules/flexboxgrid/css/flexboxgrid.min.css" type="text/css" />
+  <link rel="stylesheet" href="client/user/css/tabs.css">
+  <link rel="stylesheet" href="client/user/style.css">
+</head>
+
+<body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K8MPQTW" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
+  <div id="content">
+
+    <h1 id="loslegen">Drücke Start um loszulegen</h1>
+    <div class="row center-xs middle-xs around-xs" id="start-bt">
+      <div class="col-xs-12">
+        <div class="box box-arround">
+          <div class="row middle-xs center-xs">
+            <div class="col-xs-12">
+              <div class="box">
+                <div id="los">Start</div>
+                <div id=loader class="hidden"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="http://ms.eikoff.de:3030/socket.io/socket.io.js"></script>
+  <script src="client/user/xwiper.js"></script>
+  <script src="client/user/js/tabsSlider.js"></script>
+  <script src="client/user/script.js"></script>
+
+</body>
+
+</html>

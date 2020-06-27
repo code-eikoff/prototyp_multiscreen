@@ -7,6 +7,9 @@ const qrcode = require("./qrcode");
 const link_host = "ms.eikoff.de";
 // const link_host = "eikoff:5500";
 const link_user = link_host + "/client/user/";
+
+const link_user2 = "/client/user/";
+
 const link_host_base = "client/host/";
 
 const socket_host = io.of("/host");
@@ -37,7 +40,14 @@ const themenueb = {
   Beschreibung: [],
   Link: []
 }
+let htmlContent = 'x';
 
+fs.readFile("client/user/user.html", "utf-8", (err, data) => {
+  if (err) {
+    console.log(err);
+  }
+  htmlContent = data;
+});
 
 function ladeThemen() {
   fs.readFile("server/themen.xml", "utf-8", (err, data) => {
@@ -80,7 +90,6 @@ socket_host.on("connection", (socket) => {
   user_in_room.push([room, 0]);
   socket.join(room);
 
-  var htmlContent = `<script>window.location='/client/user/index.html#${room}'</script>`;
 
   try {
     if (fs.existsSync(`${room}.html`)) {
@@ -93,7 +102,7 @@ socket_host.on("connection", (socket) => {
   }
 
   socket.on("getQRCode", () => {
-    let qrcode_img = getQRcode("http://" + link_user + "index.html#" + room);
+    let qrcode_img = getQRcode("http://" + link_host + '/' + room);
     // socket_host.to(room).emit("qrimg", qrcode_img, link_user + "#" + room); //schicke qr-code img
     socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + ''); //schicke qr-code img
   });
@@ -109,8 +118,6 @@ socket_host.on("connection", (socket) => {
   });
 
 
-
-
   //wenn der Host sich trennt
   socket.on("disconnect", () => {
     fs.unlink(`${room}.html`, (err) => {
@@ -119,14 +126,20 @@ socket_host.on("connection", (socket) => {
         return
       }
     })
-
     client_hosts.pop(socket);
   });
 
 
 });
 
-
+function deleteRoom(room) {
+  fs.unlink(`${room}.html`, (err) => {
+    if (err) {
+      console.error(err)
+      return
+    }
+  })
+}
 
 /*
 ===========================================
@@ -157,10 +170,10 @@ socket_user.on("connection", (socket) => {
   Verbindung herstellen und in Room einloggen
   */
   socket.on("user_connect", (r) => {
-    room = r;
-    while (room.charAt(0) === "#") {
-      room = room.substr(1);
-    } //entferne # am Anfang
+    room = r.slice(-3);
+    // while (room.charAt(0) === "#") {
+    //   room = room.substr(1);
+    // } //entferne # am Anfang
     socket.join(room);
     room_nr = 0;
 
@@ -188,7 +201,7 @@ socket_user.on("connection", (socket) => {
           user_in_room[i][1] -= 1;
           if (user_in_room[i][1] < 1) {
             socket_host.to(room).emit("getrennt");
-
+            deleteRoom(room);
             try {
               if (qs_geantwortet[room_nr][1]) {
                 qs_geantwortet[room_nr][1] -= 1;
@@ -220,7 +233,7 @@ socket_user.on("connection", (socket) => {
     socket_user.to(room).emit('load_options', options);
     socket_host.to(room).emit('load_options', options);
 
-    socket_user.to(room).emit('load_content', 'home.html', 'home');
+    socket_user.to(room).emit('load_content', `${link_user2 + options[0]}.html`, 'home');
     socket_host.to(room).emit("load_content", link_host_base + "index.html");
   });
 
@@ -229,37 +242,37 @@ socket_user.on("connection", (socket) => {
 
     switch (option) {
       case options[0]: //"home"
-        socket_user.to(room).emit('load_content', `${options[0]}.html`, options[0]);
+        socket_user.to(room).emit('load_content', `${link_user2 + options[0]}.html`, options[0]);
         socket_host.to(room).emit("load_content", `${link_host_base}index.html`, options[0]);
         break;
 
       case options[1]: //"kaiserpf"
         if (slide) {
-          socket_user.to(room).emit('load_content', `${options[1]}.html`, options[1], slide);
+          socket_user.to(room).emit('load_content', `${link_user2 + options[1]}.html`, options[1], slide);
           socket_host.to(room).emit("load_content", `${link_host_base}${options[1]}.html`, options[1], slide);
         } else {
-          socket_user.to(room).emit('load_content', `${options[1]}.html`, options[1]);
+          socket_user.to(room).emit('load_content', `${link_user2 + options[1]}.html`, options[1]);
           socket_host.to(room).emit("load_content", `${link_host_base}${options[1]}.html`, options[1]);
         }
         break;
 
       case options[2]: //"lageplan"
-        socket_user.to(room).emit('load_content', `${options[2]}.html`, options[2]);
+        socket_user.to(room).emit('load_content', `${link_user2 + options[2]}.html`, options[2]);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[2]}.html`, options[2]);
         break;
 
       case options[3]: //"quiz"
-        socket_user.to(room).emit('load_content', `${options[3]}.html`, options[3]);
+        socket_user.to(room).emit('load_content', `${link_user2 + options[3]}.html`, options[3]);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[3]}.html`, options[3]);
         break;
 
       case options[4]://themenübersicht
-        socket_user.to(room).emit('load_content', `${options[4]}.html`, options[4], themenueb);
+        socket_user.to(room).emit('load_content', `${link_user2 + options[4]}.html`, options[4], themenueb);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[4]}.html`, options[4], themenueb);
         break;
 
       case options[5]://galerie
-        socket_user.to(room).emit('load_content', `${options[5]}.html`, options[5], galerie);
+        socket_user.to(room).emit('load_content', `${link_user2 + options[5]}.html`, options[5], galerie);
         socket_host.to(room).emit("load_content", `${link_host_base}${options[5]}.html`, options[5], galerie);
         break;
 
@@ -290,7 +303,7 @@ socket_user.on("connection", (socket) => {
   });
 
   socket.on("details_Tabs", (nr, slide) => {
-    socket_user.to(room).emit('load_content', `details/${options[1]}_${nr}.html`, options[1] + '_details', slide);
+    socket_user.to(room).emit('load_content', `${link_user2}details/${options[1]}_${nr}.html`, options[1] + '_details', slide);
     socket_host.to(room).emit('load_content', `${link_host_base}details/${options[1]}_${nr}.html`, options[1] + '_details', slide);
   });
 
@@ -480,7 +493,7 @@ socket_user.on("connection", (socket) => {
       readyF = true;
       geantwortet = false;
 
-      socket_user.to(room).emit('load_content', `${options[0]}.html`, options[0]);
+      socket_user.to(room).emit('load_content', `${link_user2 + options[0]}.html`, options[0]);
       socket_host.to(room).emit("load_content", `${link_host_base}index.html`, options[0]);
 
 
@@ -509,7 +522,7 @@ socket_user.on("connection", (socket) => {
 
   */
   socket.on("themaÖffnen", (i) => {
-    socket_user.to(room).emit('load_content', `details/${themenueb.Link[i]}`, `${options[4]}_details`);
+    socket_user.to(room).emit('load_content', `${link_user2}details/${themenueb.Link[i]}`, `${options[4]}_details`);
   });
 
 
