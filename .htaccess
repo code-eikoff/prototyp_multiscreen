@@ -1,3 +1,6 @@
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^([^\.]+)$ $1.html [NC,L]   
+# rule for removing www on sub domains
+RewriteCond %{HTTP_HOST} ^www\.([^.]+\.eikoff\.de)$ [NC]
+RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]

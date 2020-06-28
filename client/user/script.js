@@ -198,7 +198,7 @@ function initOpt01() {
     e[0].style.width = tabsControls[currentSlideIndex].offsetWidth + "px";
     e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
 
-    ga('send', 'event', 'interaction', 'tabs', 'Tabs slidechange', 0);
+    ga('send', 'event', 'interaction', 'tabs', 'Tabs Slide change', 0);
   });
 
   tabsControls = elem.getElementsByClassName("tabs__controls");
@@ -222,27 +222,27 @@ function initMapController() {
   initMenu();
 
   document.getElementById('btn_up').addEventListener("click", (e) => {
-    ga('send', 'event', 'interaction', 'mapControl', 'Map up', 0);
+    ga('send', 'event', 'interaction', 'mapControl', 'Lageplan pan up', 0);
     socket.emit('mapControl', 'up');
   });
   document.getElementById('btn_left').addEventListener("click", (e) => {
-    ga('send', 'event', 'interaction', 'mapControl', 'Map left', 0);
+    ga('send', 'event', 'interaction', 'mapControl', 'Lageplan pan left', 0);
     socket.emit('mapControl', 'left');
   });
   document.getElementById('btn_right').addEventListener("click", (e) => {
-    ga('send', 'event', 'interaction', 'mapControl', 'Map right', 0);
+    ga('send', 'event', 'interaction', 'mapControl', 'Lageplan pan right', 0);
     socket.emit('mapControl', 'right');
   });
   document.getElementById('btn_down').addEventListener("click", (e) => {
-    ga('send', 'event', 'interaction', 'mapControl', 'Map down', 0);
+    ga('send', 'event', 'interaction', 'mapControl', 'Lageplan pan down', 0);
     socket.emit('mapControl', 'down');
   });
   document.getElementById('btn_in').addEventListener("click", (e) => {
-    ga('send', 'event', 'interaction', 'mapControl', 'Map in', 0);
+    ga('send', 'event', 'interaction', 'mapControl', 'Lageplan pan in', 0);
     socket.emit('mapControl', 'in');
   });
   document.getElementById('btn_out').addEventListener("click", (e) => {
-    ga('send', 'event', 'interaction', 'mapControl', 'Map out', 0);
+    ga('send', 'event', 'interaction', 'mapControl', 'Lageplan pan out', 0);
     socket.emit('mapControl', 'out');
   });
 
@@ -325,7 +325,7 @@ function btnClick(option, slide) {
 }
 
 function itemGaClick(a, b) {
-  ga('send', 'event', 'interaction', 'tabs', 'Tabs Unterthemen', 0);
+  ga('send', 'event', 'interaction', 'tabs', 'Tabs Unterthemen ausgewählt', 0);
   socket.emit('details_Tabs', a, b);
 }
 
@@ -468,7 +468,7 @@ function initQuiz() {
       losBtn.addEventListener("click", (e) => {
         if (ready) {
           ready = false;
-          ga('send', 'event', 'interaction', 'quiz', 'Qiz starteNeueFrage', 0);
+          ga('send', 'event', 'interaction', 'quiz', 'Qiz starte Neue Frage', 0);
           socket.emit("starteNeueFrage", nr, qs);
         }
       });
@@ -751,13 +751,15 @@ socket.on("refresh", () => {
 
 
 xwiper.onSwipeLeft(() => {
-  ga('send', 'event', 'interaction', 'swipe', 'swipe left', 0);
   switch (currentMenuName) {
-    // options[0] ist immer die startseite (das Hauptmenü)
+
+    case "Detailansicht_details":
     case "Detailansicht":
+      ga('send', 'event', 'interaction', 'swipe', 'Detailansicht swipe left', 0);
       nextSlide();
       break;
     case "Lageplan":
+      ga('send', 'event', 'interaction', 'swipe', 'Lageplan swipe left', 0);
       socket.emit('mapControl', 'right');
       break;
 
@@ -771,73 +773,59 @@ xwiper.onSwipeLeft(() => {
 });
 
 xwiper.onSwipeRight(() => {
-  ga('send', 'event', 'interaction', 'swipe', 'swipe right', 0);
 
   switch (currentMenuName) {
 
-    // options[0] ist immer die startseite (das Hauptmenü)
+    case "Detailansicht_details":
     case "Detailansicht":
+      ga('send', 'event', 'interaction', 'swipe', 'Detailansicht swipe right', 0);
       prevSlide();
       break;
 
     case "Lageplan":
+      ga('send', 'event', 'interaction', 'swipe', 'Lageplan swipe right', 0);
       socket.emit('mapControl', 'left');
       break;
 
     // wenn nichts definiert wurde --> 
     default:
+      ga('send', 'event', 'interaction', 'swipe', 'swipe right', 0);
       break;
   }
   // window.navigator.vibrate([80,80,80]);
 });
 
 xwiper.onSwipeUp(() => {
-  ga('send', 'event', 'interaction', 'swipe', 'swipe up', 0);
 
   switch (currentMenuName) {
 
-    // options[0] ist immer die startseite (das Hauptmenü)
-    case "Detailansicht":
-
-      break;
-
     case "Lageplan":
+      ga('send', 'event', 'interaction', 'swipe', 'Lageplan swipe up', 0);
       socket.emit('mapControl', 'down');
       break;
 
     // wenn nichts definiert wurde --> 
     default:
+      ga('send', 'event', 'interaction', 'swipe', 'swipe up', 0);
       break;
   }
   // window.navigator.vibrate([260,80,80]);
 });
 
 xwiper.onSwipeDown(() => {
-  ga('send', 'event', 'interaction', 'swipe', 'swipe down', 0);
 
   switch (currentMenuName) {
 
-    // options[0] ist immer die startseite (das Hauptmenü)
-    case "Detailansicht":
-      break;
-
     case "Lageplan":
+      ga('send', 'event', 'interaction', 'swipe', 'Lageplan swipe down', 0);
       socket.emit('mapControl', 'up');
       break;
 
     // wenn nichts definiert wurde --> 
     default:
+      ga('send', 'event', 'interaction', 'swipe', 'swipe down', 0);
       break;
   }
   // window.navigator.vibrate([80,80,260]);
 });
 
-
-
-
-xwiper.onTap(() => socket.emit('say', 'tap'));
-
-
-
-// Remove listener
-// xwiper.destroy();

@@ -133,6 +133,11 @@ socket_host.on("connection", (socket) => {
   });
 
   //wenn der Host sich trennt
+  socket.on("err", (err) => {
+    console.log(err);
+  });
+
+  //wenn der Host sich trennt
   socket.on("disconnect", () => {
     deleteRoom(room)
     client_hosts.pop(socket);

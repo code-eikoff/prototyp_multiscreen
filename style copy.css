@@ -1,0 +1,166 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;400;900&family=Open+Sans:wght@300;400;800&display=swap');
+body{
+    line-height: 1;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 2em;
+}
+
+h1, h2, h3, h4{
+    font-family: 'Inter', sans-serif;
+    font-weight: 900;
+    font-size: 30px;
+    margin-top: 80px;
+}
+
+.hidden{
+    visibility: hidden;
+    display: none;
+}
+
+#cookies{
+    position: absolute;
+    height: 90px;
+    width: 200px;
+    padding:20px;
+    background-color: #b9e97a;
+    font-size: 1rem;
+}
+
+/* 
+-----------------------------
+
+Host Start view 
+
+-----------------------------
+*/
+.loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom:0;
+    margin:auto;
+    border: 12px solid #f1f1f1; /* Light grey */
+    border-top: 12px solid #678ba1; /* Blue */
+    border-radius: 50%;
+    width: 100px;
+    height: 100px;
+    transform: rotate(0deg);
+    animation: spin 1.3s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+#scan_me{
+    position: absolute;
+    margin-top: calc(40vh + 150px);
+    top: -20vh;
+    left: calc(50vw - 481px);
+    width: 200px;
+    height: 127px;
+    text-align: center;
+}
+
+#qrcode {
+    text-align: center;
+    margin-top: 40vh;
+}
+
+#qrcode img {
+    width: auto;
+    height: auto;
+    max-width: 28vw;
+    max-height: 39vh;
+    margin-top: -20vh;
+}
+
+#anweisung{
+    position: absolute;
+    width: 100vw;
+    text-align: center;
+    line-height: 41px;
+    font-size: 0.8em;
+    left: 0;
+    right: 0;
+    top: 85vh;
+}
+#anweisung h3{
+    margin:unset;
+}
+#border{
+    position: absolute;
+    width: calc(100vw - 30px);
+    height: calc(100vh - 30px);
+    border: #4cb34c solid 5px;
+    top: 10px;
+    left: 10px;
+}
+
+/* 
+-----------------------------
+
+quiz section 
+
+-----------------------------
+*/
+
+#frage {
+    text-align: center;
+    margin-top: 30px; 
+    margin-bottom: 30px;
+    font-size: 2em;
+    height: calc(20vh - 50px);
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    justify-content: center;
+}    
+
+#antworten {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    display: -webkit-flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    height: 70vh;
+}
+
+.antwort {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-box-align: center;
+    -webkit-align-items: center;
+    -ms-flex-align: center;
+    align-items: center;
+    justify-content: center;
+    width: 40%;
+    margin: 10px;
+    height: auto;
+    border: 1px solid rgb(151, 151, 151);
+    background-color: rgb(231, 231, 231);
+    border-radius: 6px;
+
+}
+
+.gradient_richtig{
+    background: linear-gradient(90deg, rgb(81, 187, 83) 0%, rgba(255,255,255,1) 0%);
+}
+.gradient_falsch{
+    background: linear-gradient(90deg, rgb(206, 85, 85) 0%, rgba(255,255,255,1) 0%);
+}

@@ -142,39 +142,47 @@ function initOpt01() {
       duration: 600,
       easing: 'cubic-bezier(0.0, 0.0, 0.2, 1)'
     });
+
+
+    setTimeout(setTabbarOffset, 300);
+
+    socket.on("change_Slide", (nr) => {
+      currentSlideIndex = nr;
+      try {
+
+        tabs.show(currentSlideIndex);
+        setTabbarOffset();
+      } catch (error) {
+        socket.emit("err", error);
+
+      }
+
+      let e = document.getElementsByClassName("tabs__line");
+      e[0].style.width = tabsControls[currentSlideIndex].offsetWidth + "px";
+      e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
+      // socket.emit("say", tabsControls[currentSlideIndex].offsetWidth)
+    });
+
+    socket.on("scrollToItem", (i) => {
+      let e = document.getElementsByClassName('item');
+      let y = e[i].getBoundingClientRect().top + window.scrollY - 70;
+      window.scrollTo(window.scrollX, y)
+    });
+
+
+
+    tabsControls = elem.getElementsByClassName("tabs__controls");
+
+    for (let i = 0; i < tabsControls.length; i++) {
+      tabsControls[i].addEventListener("click", (e) => {
+        socket.emit('slideChange', i);
+      });
+    }
   } catch (error) {
     console.log(error);
   }
 
 
-  setTimeout(setTabbarOffset, 300);
-
-  socket.on("change_Slide", (nr) => {
-    currentSlideIndex = nr;
-    tabs.show(currentSlideIndex);
-    setTabbarOffset();
-
-    let e = document.getElementsByClassName("tabs__line");
-    e[0].style.width = tabsControls[currentSlideIndex].offsetWidth + "px";
-    e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
-    // socket.emit("say", tabsControls[currentSlideIndex].offsetWidth)
-  });
-
-  socket.on("scrollToItem", (i) => {
-    let e = document.getElementsByClassName('item');
-    let y = e[i].getBoundingClientRect().top + window.scrollY - 70;
-    window.scrollTo(window.scrollX, y)
-  });
-
-
-
-  tabsControls = elem.getElementsByClassName("tabs__controls");
-
-  for (let i = 0; i < tabsControls.length; i++) {
-    tabsControls[i].addEventListener("click", (e) => {
-      socket.emit('slideChange', i);
-    });
-  }
 
 }
 
