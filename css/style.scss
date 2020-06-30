@@ -499,24 +499,7 @@ Themenübersicht
 
   }
 
-#ch-01 .box-arround{
-  background-color: #c2b1b1;
-}
-#ch-02 .box-arround{
-  background-color: #c1c2b1;
-}
-#ch-03 .box-arround{
-  background-color: #b4c2b1;
-}
-#ch-04 .box-arround{
-  background-color: #b1c1c2;
-}
-#ch-05 .box-arround{
-  background-color: #b2b1c2;
-}
-#ch-06 .box-arround{
-  background-color: #bdb1c2;
-}
+
 
 
 #chose .box-arround .row {
@@ -536,9 +519,45 @@ Themenübersicht
 #chose .thueb_img .box{
   height: 100%;
   width: 100%;
-  background-image: url("/img/platzhalter.png");
+  background-image: url("/img/1.png");
   background-size: cover;
-  background-position: center center;
+  background-position: center top;
+}
+#ch-01 .box-arround{
+  background-color: #c2b1b1;
+  .thueb_img .box{
+    background-image: url("/img/1.png");
+  }
+}
+#ch-02 .box-arround{
+  background-color: #c1c2b1;
+  .thueb_img .box{
+    background-image: url("/img/2.png");
+  }
+}
+#ch-03 .box-arround{
+  background-color: #b4c2b1;
+  .thueb_img .box{
+    background-image: url("/img/3.png");
+  }
+}
+#ch-04 .box-arround{
+  background-color: #b1c1c2;
+  .thueb_img .box{
+    background-image: url("/img/4.png");
+  }
+}
+#ch-05 .box-arround{
+  background-color: #b2b1c2;
+  .thueb_img .box{
+    background-image: url("/img/5.png");
+  }
+}
+#ch-06 .box-arround{
+  background-color: #bdb1c2;
+  .thueb_img .box{
+    background-image: url("/img/platzhalter.png");
+  }
 }
 #chose .thueb_text{
   height: 54%;

@@ -217,7 +217,7 @@ function initOptMap() {
     var popupLocation1 = new L.LatLng(51.902887, 10.425524);
     var popupLocation2 = new L.LatLng(51.905673, 10.427703);
 
-    var popupContent1 = '<b>Kaiserpfalz</b><br>Hier stehen grobe Details',
+    var popupContent1 = '<b>Kaiserpfalz</b><br>Hier wird eine Themenübersicht gezeigt',
       popup1 = new L.Popup({
         closeOnClick: false,
         autoClose: false,
@@ -226,7 +226,7 @@ function initOptMap() {
     popup1.setLatLng(popupLocation1);
     popup1.setContent(popupContent1);
 
-    var popupContent2 = '<b>Marktkirche</b><br>Hier stehen grobe Details',
+    var popupContent2 = '<b>Marktkirche</b><br>Eine Galerie ist hier zu finden',
       popup2 = new L.Popup({
         closeOnClick: false,
         autoClose: false,
@@ -243,7 +243,7 @@ function initOptMap() {
       forceZIndex: 100
     })
       .setLatLng([51.905941, 10.429067])
-      .setContent("<b>Marktplatz</b><br>Hier stehen grobe Details");
+      .setContent("<b>Marktplatz</b><br>Hier gibt es ein Quiz");
     mymap.addLayer(popup3);
 
     var popup4 = L.popup({
@@ -252,7 +252,7 @@ function initOptMap() {
       forceZIndex: 100
     })
       .setLatLng([51.903271, 10.427731])
-      .setContent("<b>Domvorhalle</b><br>Hier stehen grobe Details");
+      .setContent("<b>Domvorhalle</b><br>Hier sind viele Detaills in einer Registeransicht");
     mymap.addLayer(popup4);
 
     mymap.addLayer(popup1).addLayer(popup2);

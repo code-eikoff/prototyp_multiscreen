@@ -21,9 +21,9 @@ let user_in_room = [];
 
 let quiz_sessions = [];
 let qs_geantwortet = [];
-const timer_quiz_frage = 3000; //ms
-const timer_next_qz = 15000 + timer_quiz_frage; //ms
-const anzahlFragen = 5;
+const timer_quiz_frage = 4000; //ms
+const timer_next_qz = 105000 + timer_quiz_frage; //ms
+const anzahlFragen = 3;
 const punkte_max = timer_next_qz / 100;
 
 const options = [
@@ -127,12 +127,11 @@ socket_host.on("connection", (socket) => {
   });
 
   socket.on("getrennt", () => {
-    console.log("getrennt");
-    deleteRoom(room)
-    client_hosts.pop(socket);
+    // console.log("getrennt");
+    // deleteRoom(room)
+    // client_hosts.pop(socket);
   });
 
-  //wenn der Host sich trennt
   socket.on("err", (err) => {
     console.log(err);
   });
@@ -391,7 +390,7 @@ socket_user.on("connection", (socket) => {
 
   socket.on("neueQuizSession", () => {
     console.log("neueQuizSession");//ooooooooo
-
+    stopTimerQz();
     neueQuizSession(room, anzahlFragen);
 
     // setTimeout(() => {
@@ -408,6 +407,7 @@ socket_user.on("connection", (socket) => {
 
       qs_geantwortet.push([0, user_in_room[nr][1]]);
       console.log(user_in_room[nr][1]);
+      stopTimerQz();
 
       socket_user.to(qs.Room).emit('platzhalter');
       socket_host.to(qs.Room).emit('zeigeFrage', qs.Fragen[qs.FrageNr].frage, timer_quiz_frage, nr, qs);
@@ -421,6 +421,7 @@ socket_user.on("connection", (socket) => {
   });
 
   socket.on("starteNeueFrage", (nr, qs) => {
+    stopTimerQz();
 
     if (readyF) {
       readyF = false;
@@ -476,7 +477,7 @@ socket_user.on("connection", (socket) => {
         ga = qs_geantwortet[nr][0];
         ges = user_in_room[nr][1];
 
-        console.log(correctAntw + " <-correctAntw  antw->" + antw);
+        // console.log(correctAntw + " <-correctAntw  antw->" + antw);
         if (correctAntw == antw) {
           punkte += punkte_max - t;
         }
@@ -492,8 +493,8 @@ socket_user.on("connection", (socket) => {
               socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
 
             } else {
-              neueFage(nr, qs);
               stopTimerQz();
+              neueFage(nr, qs);
               geantwortet = false;
             }
           }
@@ -625,16 +626,16 @@ function neueQuizSession(room, fragen_anzahl) {
   setTimeout(() => {
     console.log("1: " + quiz_session);
     socket_user.to(room).emit('QuizSessionBereit', quiz_session_number, quiz_session);
-  }, 500);
+  }, 3500);
 
 }
 
 
 function neueFage(nr, qs) {
   // let qs = quiz_sessions[nr];
-  qs.FrageNr++
+  qs.FrageNr++;
   // if (qs.FrageNr < qs.Fragen.length) {
-  console.log("socket_user.to(qs.Room).emit('neueFrageBereit')")
+  console.log("socket_user.to(qs.Room).emit('neueFrageBereit')");
   socket_user.to(qs.Room).emit('neueFrageBereit', nr, qs);
 
   let correctAntw = qs.Fragen[qs.FrageNr - 1].correct;
