@@ -5,21 +5,16 @@ let backButtonLoc = 'home';
 
 let options = ["home"];
 
-// console.time();
 
 const socket = io("http://ms.eikoff.de:3030/host");
 
-socket.emit("getQRCode");
+// socket.emit("getQRCode");
 
-
-// socket.on('number', data => number_div.innerHTML = data );
-
-socket.on("qrimg", (img, link, color) => {
-  // console.timeEnd();
+socket.on("qrimg", (img, link) => {
   document.getElementById("scan_me").classList.remove("hidden");
   let qrcode_div = document.getElementById("qrcode");
   qrcode_div.innerHTML = img + `<h3>${link}</h3>`;
-
+  importContent(link);
 });
 
 socket.on("verbunden", () => {
@@ -32,8 +27,6 @@ socket.on("verbunden", () => {
 
 socket.on("getrennt", () => location.reload());
 
-
-
 socket.on("load_options", (data) => options = data);
 
 socket.on("load_content", (html_link, name) => {
@@ -42,11 +35,11 @@ socket.on("load_content", (html_link, name) => {
 });
 
 socket.on("load_content", (html_link, name, data) => {
-  importContent(html_link, name);
+  importContent(html_link);
   initContent(name, data);
 });
 
-function importContent(link, name) {
+function importContent(link) {
   let xhr = new XMLHttpRequest();
   xhr.open("GET", link, true);
   xhr.onreadystatechange = function () {
@@ -88,7 +81,7 @@ function initContent(name, data) {
       setTimeout(initOpt01, 400);
       break;
 
-    case (`Detailansicht_details`)://Detailansicht Kaiserpfalz_details
+    case (`Detailansicht_details`)://Detailansicht Kaiserpfalz Untermenü
       if (data) currentSlideIndex = data;
       setTimeout(initOpt01, 400);
       break;
@@ -353,10 +346,10 @@ function initOptMap() {
 
   socket.on("zoom", (z) => {
     switch (z) {
-      case "in":
+      case `in`:
         mymap.zoomIn();
         break;
-      case "out":
+      case `out`:
         mymap.zoomOut();
         break;
       default:
@@ -421,7 +414,7 @@ function initQuiz() {
           if (ready) {
             ready = false;
             //übermittle, dass nun die Antworten angezeigt werden können
-            socket.emit("set_user_antworten", nr, qs);
+            socket.emit("frage_ist_bereit", nr, qs);
             neueFrage = true;
           }
         }
@@ -489,29 +482,21 @@ function initThemenueb(themen) {
 
 // G a l e r i e
 function initGalerie(galerie) {
-
-  let nummer = 0;
-
-  socket.on("next_Pic", (nummer) => {
-    ladeInhalt(nummer);
-  });
-
-
   function ladeInhalt(nummer) {
     try {
       let pic = document.getElementById(`galerie_img`);
       pic.style.backgroundImage = `url('${galerie.bild[nummer].bild_link}')`;
     } catch (error) {
-      socket.emit('err', error);
+      socket.emit(`err`, error);
     }
   }
-
-  ladeInhalt(nummer);
-
-
+  ladeInhalt(0);
+  socket.on(`next_Pic`, (nummer) => {
+    ladeInhalt(nummer);
+  });
 }
 
 
-socket.on("refresh", () => {
+socket.on(`refresh`, () => {
   location.reload();
 });

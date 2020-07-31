@@ -6,10 +6,7 @@ const qrcode = require("./qrcode");
 
 const link_host = "ms.eikoff.de";
 // const link_host = "eikoff:5500";
-const link_user = link_host + "/client/user/";
-
 const link_user2 = "/client/user/";
-
 const link_host_base = "client/host/";
 
 const socket_host = io.of("/host");
@@ -26,6 +23,10 @@ const timer_next_qz = 105000 + timer_quiz_frage; //ms
 const anzahlFragen = 3;
 const punkte_max = timer_next_qz / 100;
 
+/**
+ * Menü namen in richtiger Reihenfolge, werden als id verwendet
+ * home, Lageplan, Themenübersicht, Detailansicht,..
+ */
 const options = [
   "home",
   "Lageplan",
@@ -33,15 +34,7 @@ const options = [
   "Detailansicht",
   "Galerie",
   "Quiz"
-
-  // "home",
-  // "Detailansicht",
-  // "Lageplan",
-  // "Quiz",
-  // "Themenübersicht",
-  // "Galerie"
 ];
-
 
 
 const themenueb = {
@@ -51,21 +44,26 @@ const themenueb = {
 }
 let htmlContent = 'x';
 
+//liest die HTML Datei für die tempotäre neue Unterseite aus
 fs.readFile("client/user/user.html", "utf-8", (err, data) => {
-  if (err) {
-    console.log(err);
-  }
-  htmlContent = data;
+  if (err) console.log(err);
+  else htmlContent = data;
 });
 
+
+/**
+  * @desc liest die Themenübersicht-Daten aus einer xml Datei aus und speichert sie in "themenueb" object
+*/
 function ladeThemen() {
   fs.readFile("server/themen.xml", "utf-8", (err, data) => {
     if (err) {
       console.log(err);
+      return;
     }
     parseString(data, (err, result) => {
       if (err) {
         console.log(err);
+        return;
       }
       var json = result;
       for (let i = 0; i < 6; i++) {
@@ -92,8 +90,6 @@ function ladeThemen() {
 socket_host.on("connection", (socket) => {
   ladeThemen();
   client_hosts.push(socket); //host wird im array gespeichert
-  // let room = 'room'+client_hosts.length;
-
   let room = makeid(3);
   // room = "b";
   user_in_room.push([room, 0]);
@@ -110,13 +106,11 @@ socket_host.on("connection", (socket) => {
     console.error(err)
   }
 
-  socket.on("getQRCode", () => {
-    let qrcode_img = getQRcode("http://" + link_host + '/' + room);
-    // socket_host.to(room).emit("qrimg", qrcode_img, link_user + "#" + room); //schicke qr-code img
-    socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + ''); //schicke qr-code img
-  });
+  let qrcode_img = getQRcode("http://" + link_host + '/' + room);
+  socket_host.to(room).emit("qrimg", qrcode_img, link_host + "/" + room + ''); //schicke qr-code img
 
-  socket.on("set_user_antworten", (nr, qs) => {
+
+  socket.on("frage_ist_bereit", (nr, qs) => {
     setTimeout(() => {
       // let qs = quiz_sessions[nr];
       let fnr = qs.FrageNr;
@@ -127,9 +121,9 @@ socket_host.on("connection", (socket) => {
   });
 
   socket.on("getrennt", () => {
-    // console.log("getrennt");
-    // deleteRoom(room)
-    // client_hosts.pop(socket);
+    console.log("getrennt");
+    deleteRoom(room)
+    client_hosts.pop(socket);
   });
 
   socket.on("err", (err) => {
@@ -144,7 +138,10 @@ socket_host.on("connection", (socket) => {
 
 
 });
-
+/**
+  * @desc löscht den Raum
+  * @param string room - name vom zu löschenden raum
+*/
 function deleteRoom(room) {
   fs.unlink(`${room}.html`, (err) => {
     if (err) {
@@ -184,36 +181,43 @@ socket_user.on("connection", (socket) => {
   */
   socket.on("user_connect", (r) => {
     room = r.slice(-3);
-    // while (room.charAt(0) === "#") {
-    //   room = room.substr(1);
-    // } //entferne # am Anfang
     socket.join(room);
     room_nr = 0;
 
+    /**
+     * prüft ob der Raum existiert
+     * speichert neuen user
+     * 
+     * //ist vielleicht besser mit Objekten zu lösen oder so
+     */
     if (user_in_room[0]) {
       for (i = 0; i < user_in_room.length; i++) {
         if (user_in_room[i][0] === room) {
           user_in_room[i][1]++;
           room_nr = i;
+          socket_host.to(room).emit("verbunden");
         }
       }
     }
-    socket_host.to(room).emit("verbunden");
   });
 
   /*
   Verbindung trennen
+  anzahl der User im Raum um eins verringern
+  falls dann keiner im Raum ist - host getrennt schicken, der läd dann neu
   */
   socket.on("disconnect", () => {
-    // console.log(socket_user.in(room).listenerCount.length)
     client_users.pop(socket);
 
     if (user_in_room[0]) {
       for (i = 0; i < user_in_room.length; i++) {
+
         if (user_in_room[i][0] === room) {
           user_in_room[i][1] -= 1;
+
           if (user_in_room[i][1] < 1) {
             socket_host.to(room).emit("getrennt");
+
             try {
               if (qs_geantwortet[room_nr][1]) {
                 qs_geantwortet[room_nr][1] -= 1;
@@ -248,6 +252,7 @@ socket_user.on("connection", (socket) => {
     socket_user.to(room).emit('load_content', `${link_user2 + options[0]}.html`, 'home');
     socket_host.to(room).emit("load_content", link_host_base + "index.html", 'home');
   });
+
 
   // wenn ein button der Themen-Auswahl im Hauptmenü geklickt wird
   socket.on("btn_click", (option, slide) => {
@@ -378,33 +383,33 @@ socket_user.on("connection", (socket) => {
   
   */
 
+
+  /**
+  * @desc starte den Timer neu der die Frage stoppt
+  * @param string nr - Fragenummer
+  * @param string nr - Fragenummer
+  */
   function starteTimerStoppFrage(nr, qs) {
     timer_qz = setTimeout(() => {
       neueFage(nr, qs);
     }, timer_next_qz);
   }
 
+  /**
+   * Stoppt den Timer für das Quiz
+   */
   function stopTimerQz() {
     clearTimeout(timer_qz);
   }
 
   socket.on("neueQuizSession", () => {
-    console.log("neueQuizSession");//ooooooooo
     stopTimerQz();
     neueQuizSession(room, anzahlFragen);
-
-    // setTimeout(() => {
-    //   console.log(quiz_sessions[0]);
-    // }, 1000);
 
   });
 
   socket.on("starteQuizSession", (nr, qs) => {
-
-    console.log("starteQuizSession");//ooooooooo
     try {
-      // let qs = quiz_sessions[nr];
-
       qs_geantwortet.push([0, user_in_room[nr][1]]);
       console.log(user_in_room[nr][1]);
       stopTimerQz();
@@ -416,11 +421,14 @@ socket_user.on("connection", (socket) => {
       socket_user.to(qs.Room).emit("refresh");
       socket_host.to(qs.Room).emit("refresh");
     }
-
-
   });
 
+  /**
+   * neue Frage starten
+   * falls alle Fragen durch - statistik anzeigen
+   */
   socket.on("starteNeueFrage", (nr, qs) => {
+
     stopTimerQz();
 
     if (readyF) {
@@ -430,8 +438,6 @@ socket_user.on("connection", (socket) => {
         let frage = qs.Fragen[qs.FrageNr].frage;
 
         if (qs.FrageNr <= anzahlFragen) {
-          socket_user.to(qs.Room).emit('platzhalter');
-          socket_host.to(qs.Room).emit('zeigeFrage', frage, timer_quiz_frage, nr, qs);
 
           if (qs.FrageNr + 1 == anzahlFragen) {
             setTimeout(() => {
@@ -442,6 +448,9 @@ socket_user.on("connection", (socket) => {
             }, timer_next_qz);
 
           } else {
+            socket_user.to(qs.Room).emit('platzhalter');
+            socket_host.to(qs.Room).emit('zeigeFrage', frage, timer_quiz_frage, nr, qs);
+
             starteTimerStoppFrage(nr, qs);
           }
 
@@ -449,25 +458,28 @@ socket_user.on("connection", (socket) => {
         else {
           stopTimerQz();
           socket_user.to(qs.Room).emit("ladeStatistik");
-          socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
+          socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Fehler im Spiel<br/>qs.FrageNr + 1 == anzahlFragen</h2>");
 
         }
       } catch (error) {
         stopTimerQz();
         socket_user.to(qs.Room).emit("ladeStatistik");
-        socket_host.to(qs.Room).emit("zeigeStatistik", "<h2>Quiz ist vorbei<br/>hier würden die Statistiken angezeigt werden</h2>");
-        console.error("error in starteNeueFrage: " + error);
+        socket_host.to(qs.Room).emit("zeigeStatistik", `<h2>Fehler im Spiel:</h2>${error}`);
       }
 
     }
 
   });
 
+  /**
+   * wenn ein Spieler antwortet
+   * wertet Antwort aus
+   * falls letzte Frage und alle anderen geantwortet - beende Quiz
+   */
   socket.on("antwort", (antw, t, nr, qs) => {
+
     let ga = 0;
     let ges = 1;
-    // let qs = quiz_sessions[nr];
-
 
     try {
       let correctAntw = qs.Fragen[qs.FrageNr].correct;
@@ -477,7 +489,6 @@ socket_user.on("connection", (socket) => {
         ga = qs_geantwortet[nr][0];
         ges = user_in_room[nr][1];
 
-        // console.log(correctAntw + " <-correctAntw  antw->" + antw);
         if (correctAntw == antw) {
           punkte += punkte_max - t;
         }
@@ -516,6 +527,10 @@ socket_user.on("connection", (socket) => {
 
   });
 
+  /**
+   * Zeigt die Punkte des Spielers an
+   *  //hier können Statistiken eingefügt werden, die auf dem Host angezeigt werden
+   */
   socket.on("ladeStatistik", () => {
     stopTimerQz();
     socket.emit("zeigeStatistik", Math.round((punkte / 10)));
@@ -536,6 +551,10 @@ socket_user.on("connection", (socket) => {
 ==================================================
 
   */
+
+  /**
+   * Unterthema bei der Themenübersicht anzeigen
+   */
   socket.on("themaÖffnen", (i) => {
     socket_user.to(room).emit('load_content', `${link_user2}details/${themenueb.Link[i]}`, `Themenübersicht_details`);
   });
@@ -556,8 +575,12 @@ socket_user.on("connection", (socket) => {
 
   */
 
-  socket.on("next_Pic", (n) => {
 
+  /**
+    * neues Bild anzeigen
+    * sendet Bildnummer an Clients
+  */
+  socket.on("next_Pic", (n) => {
     socket_user.to(room).emit('next_Pic', n);
     socket_host.to(room).emit('next_Pic', n);
   });
@@ -566,7 +589,6 @@ socket_user.on("connection", (socket) => {
 
 
 });
-
 
 
 
@@ -583,20 +605,28 @@ socket_user.on("connection", (socket) => {
 
 */
 
-/*
-erstelle ein QRCode-Link als Bild
+/**
+  * @desc erstelle ein QRCode-Link als Bild
+  * @param string link - Link zum verbinden als User
+  * @return img - QRCode
 */
 function getQRcode(link) {
   let typeNumber = 4;
   let errorCorrectionLevel = "M";
+  /**
+   * @author Kazuhiko Arase (2009)
+   * @source https://github.com/kazuhikoarase/qrcode-generator
+   */
   let qr = qrcode(typeNumber, errorCorrectionLevel);
   qr.addData(link);
   qr.make();
   return qr.createImgTag("10", "0", "qrcode");
 }
 
-/*
-erstelle eine zufällige id
+/**
+  * erstelle eine zufällige id
+  * @param {int} int length, länge der Zeichen der id
+  * @return {sting} string - zufällige id
 */
 function makeid(length) {
   var result = "";
@@ -609,7 +639,11 @@ function makeid(length) {
   return result;
 }
 
-
+/**
+  * @desc startet neues Quiz. Läd Fragen. Sendet quizsession an user
+  * @param string room - Raumname
+  * @param int fragen_anzahl - Anzahl der Fragen
+*/
 function neueQuizSession(room, fragen_anzahl) {
 
   let quiz_session_number = quiz_sessions.length;
@@ -630,7 +664,11 @@ function neueQuizSession(room, fragen_anzahl) {
 
 }
 
-
+/**
+  * @desc startet neue Frage
+  * @param int nr - Frage Nummer
+  * @param object qs - Quizsession {Raum, SessionNumber, Fragen,...}
+*/
 function neueFage(nr, qs) {
   // let qs = quiz_sessions[nr];
   qs.FrageNr++;
@@ -645,12 +683,16 @@ function neueFage(nr, qs) {
   // } else {
   //   socket_user.to(qs.room).emit('zeigeStatistikSeite');
   //   socket_host.to(qs.Room).emit("zeigeStatistik", "hier kommen die Statistiken hin");
-
   // }
 
 }
 
-
+/**
+  * @desc liest aus der quiz.xml Datei eine bestimmte Frage aus
+  * @param int n - nummer der Frage
+  * @return Object {frage_nummer: number; frage: string; antworten: array[]; correct: number;
+}
+*/
 function getFrageAntwort(n) {
 
   let fa = { frage_nummer: n, frage: "?", antworten: [], correct: 0 };
@@ -690,7 +732,10 @@ function getFrageAntwort(n) {
   return fa;
 }
 
-
+/**
+  * @desc Läd die Daten für die Galerie aus einer json Datei
+  * @return json objekt
+*/
 function getGalerie() {
   let rawdata = fs.readFileSync('server/galerie.json');
   return JSON.parse(rawdata);

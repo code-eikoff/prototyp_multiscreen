@@ -1,5 +1,4 @@
 
-const button = document.getElementById("los");
 const xwiper = new Xwiper("#content", 8);
 
 let currentSlideIndex = 0;
@@ -11,17 +10,15 @@ let options = ["home"];
 let elm, tabs, tabsControls = null;
 
 const socket = io("http://ms.eikoff.de:3030/user");
-// window.addEventListener("load", socket.emit("user_connect", window.location.hash));
 window.addEventListener("load", socket.emit("user_connect", window.location.href));
-console.log(window.location.href)
-window.onhashchange = () => socket.emit("user_connect", window.location.hash);
 
 setTimeout(() => {
   ga('create', 'UA-141496757-3', 'auto');
 }, 700);
 
+$.ajaxSetup({ cache: false });
 
-
+const button = document.getElementById("los");
 button.addEventListener("click", (e) => {
   document.getElementById("los").classList.add("hidden");
   document.getElementById("loader").classList.remove("hidden");
@@ -40,14 +37,12 @@ button.addEventListener("click", (e) => {
   }
 
   socket.emit('start');
-  // socket.emit("lade_Seite", "quiz");
 
 });
 
-socket.on("vibrate", (pattern) => {
-  window.navigator.vibrate(pattern);
-});
-
+// socket.on("vibrate", (pattern) => {
+//   window.navigator.vibrate(pattern);
+// });
 
 socket.on("load_options", (data) => options = data);
 
@@ -148,6 +143,15 @@ function initContent(name, data) {
 }
 
 
+/*
+=============================
+
+Hauptmanü
+
+================================
+*/
+
+
 function initHome() {
 
   initMenu();
@@ -167,10 +171,19 @@ function initHome() {
 
 }
 
+
 /*
+=============================
+
 Registerkarten
+
+================================
 */
+
+
+
 function initOpt01() {
+
   let ready = true;
   initMenu();
   elem = document.querySelector('.tabs');
@@ -215,8 +228,111 @@ function initOpt01() {
 
   setTimeout(initScrollItems, 300);
 
+
+
+
+  function setTabbarOffset() {
+
+    let lastI = tabsControls[tabsControls.length - 1]
+    let currentI = tabsControls[currentSlideIndex];
+
+    let ci_off_l = currentI.offsetLeft;
+    let ci_width = currentI.offsetWidth;
+
+    let tabbarlist = document.getElementById("tabbarlist");
+
+    let x = window.innerWidth - lastI.getBoundingClientRect().right;
+    let y = window.innerWidth - lastI.getBoundingClientRect().right + lastI.offsetWidth
+
+    if (ci_off_l <= 0) {
+      tabbarlist.style.transform = `translateX(-${0}px)`;
+    }
+    else if (ci_off_l > 10) {
+      tabbarlist.style.transform = `translateX(-${ci_off_l - 60}px)`;
+    }
+
+    let e = document.getElementsByClassName("tabs__line");
+    e[0].style.width = tabsControls[currentSlideIndex].offsetWidth + "px";
+    e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
+
+  }
+
+  function initScrollItems() {
+    initMenu();
+
+    let last_known_scroll_position = 0;
+    let current_Item_in_view = 0;
+    let ticking = false;
+
+    function doSomething(scroll_pos) {
+      let elem = document.getElementsByClassName('item');
+
+      if (last_known_scroll_position > scroll_pos) {
+
+        for (let i = 0; i < elem.length; i++) {
+          if (isElementInViewport(elem[i])) {
+            if (current_Item_in_view != i) {
+              socket.emit('scrollToItem', i);
+              current_Item_in_view = i;
+            }
+          }
+        }
+
+      } else {
+
+        for (let i = 0; i < elem.length; i++) {
+          if (isElementInViewport(elem[i])) {
+            if (current_Item_in_view != i) {
+              socket.emit('scrollToItem', i);
+              current_Item_in_view = i;
+            }
+          }
+        }
+
+      }
+
+    }
+
+    function isElementInViewport(el) {
+      var rect = el.getBoundingClientRect();
+      return (
+        rect.top + ((el.offsetHeight / 2) + 20) >= (window.innerHeight / 2) - 150 &&
+        rect.left >= 0 &&
+        rect.bottom - ((el.offsetHeight / 2) - 20) <= (window.innerHeight / 2) + 150 &&
+        rect.right <= (window.innerWidth)
+
+      );
+    }
+
+    window.addEventListener('scroll', (e) => {
+      if (!ticking) {
+        window.requestAnimationFrame(function () {
+          doSomething(window.scrollY);
+          last_known_scroll_position = window.scrollY;
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    let e = document.getElementsByClassName("tabs__line");
+    e[0].style.width = tabsControls[currentSlideIndex].offsetWidth + "px";
+    e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
+
+  }
+
+
+
 }
 
+
+/*
+=============================
+
+Lageplan
+
+================================
+*/
 
 function initMapController() {
   initMenu();
@@ -250,71 +366,6 @@ function initMapController() {
 
 
 
-
-
-function initScrollItems() {
-  initMenu();
-
-  let last_known_scroll_position = 0;
-  let current_Item_in_view = 0;
-  let ticking = false;
-
-  function doSomething(scroll_pos) {
-    let elem = document.getElementsByClassName('item');
-
-    if (last_known_scroll_position > scroll_pos) {
-
-      for (let i = 0; i < elem.length; i++) {
-        if (isElementInViewport(elem[i])) {
-          if (current_Item_in_view != i) {
-            socket.emit('scrollToItem', i);
-            current_Item_in_view = i;
-          }
-        }
-      }
-
-    } else {
-
-      for (let i = 0; i < elem.length; i++) {
-        if (isElementInViewport(elem[i])) {
-          if (current_Item_in_view != i) {
-            socket.emit('scrollToItem', i);
-            current_Item_in_view = i;
-          }
-        }
-      }
-
-    }
-
-  }
-
-  function isElementInViewport(el) {
-    var rect = el.getBoundingClientRect();
-    return (
-      rect.top + ((el.offsetHeight / 2) + 20) >= (window.innerHeight / 2) - 150 &&
-      rect.left >= 0 &&
-      rect.bottom - ((el.offsetHeight / 2) - 20) <= (window.innerHeight / 2) + 150 &&
-      rect.right <= (window.innerWidth)
-
-    );
-  }
-
-  window.addEventListener('scroll', (e) => {
-    if (!ticking) {
-      window.requestAnimationFrame(function () {
-        doSomething(window.scrollY);
-        last_known_scroll_position = window.scrollY;
-        ticking = false;
-      });
-      ticking = true;
-    }
-  });
-
-  let e = document.getElementsByClassName("tabs__line");
-  e[0].style.width = tabsControls[currentSlideIndex].offsetWidth + "px";
-  e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
-
-}
 
 function btnClick(option) {
   socket.emit('btn_click', option);
@@ -394,31 +445,7 @@ function nextSlide() {
   socket.emit("slideChange", currentSlideIndex);
 }
 
-function setTabbarOffset() {
 
-  let lastI = tabsControls[tabsControls.length - 1]
-  let currentI = tabsControls[currentSlideIndex];
-
-  let ci_off_l = currentI.offsetLeft;
-  let ci_width = currentI.offsetWidth;
-
-  let tabbarlist = document.getElementById("tabbarlist");
-
-  let x = window.innerWidth - lastI.getBoundingClientRect().right;
-  let y = window.innerWidth - lastI.getBoundingClientRect().right + lastI.offsetWidth
-
-  if (ci_off_l <= 0) {
-    tabbarlist.style.transform = `translateX(-${0}px)`;
-  }
-  else if (ci_off_l > 10) {
-    tabbarlist.style.transform = `translateX(-${ci_off_l - 60}px)`;
-  }
-
-  let e = document.getElementsByClassName("tabs__line");
-  e[0].style.width = tabsControls[currentSlideIndex].offsetWidth + "px";
-  e[0].style.transform = "translate3D(" + tabsControls[currentSlideIndex].offsetLeft + "px, 0px , 0px)";
-
-}
 
 
 
@@ -561,7 +588,7 @@ function initQuiz() {
                 <div class="row middle-xs center-xs">
                     <div class="col-xs-12">
                         <div class="box">
-                            <div>warten...</div>
+                            <div>schaue auf den anderen Bildschirm</div>
                         </div>
                     </div>
                 </div>
@@ -628,10 +655,6 @@ function initThema() {
 
 ================================
 */
-
-
-
-
 
 function initGalerie(galerie) {
 
@@ -727,12 +750,6 @@ function initGalerie(galerie) {
   xwiper.onSwipeRight(() => prevPic());
 
 }
-
-
-
-
-
-
 
 
 socket.on("refresh", () => {
